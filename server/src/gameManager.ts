@@ -1,4 +1,10 @@
-import { GameState, Player, initGame, drawCard, playCard, discardCards, endTurn, canPlayCard } from '../../shared/index';
+import { 
+    GameState, 
+    initGame, 
+    reduceGameState, 
+    ActionRequest,
+    GameAction
+} from '../../shared/index';
 
 interface Room {
     id: string;
@@ -54,13 +60,9 @@ export const startGame = (roomId: string) => {
     if (!room || room.status !== 'waiting') return null;
     if (room.players.length < 2) throw new Error('Not enough players (min 2)');
     
-    const playerNames = room.players.map(p => p.name);
-    room.gameState = initGame(playerNames);
+    const initialPlayers = room.players.map(p => ({ id: p.id, name: p.name }));
+    room.gameState = initGame(initialPlayers);
     
-    room.gameState.players.forEach((p, index) => {
-        p.id = room.players[index].id;
-    });
-
     room.status = 'playing';
     room.lastActivity = Date.now();
     return room.gameState;
@@ -68,52 +70,34 @@ export const startGame = (roomId: string) => {
 
 export const getRoom = (roomId: string) => rooms[roomId];
 
-export const processAction = (roomId: string, playerId: string, action: any) => {
+/**
+ * Authoritative Action Processor
+ */
+export const processAction = (roomId: string, playerId: string, action: GameAction) => {
     const room = rooms[roomId];
-    if (!room || room.status !== 'playing' || !room.gameState) throw new Error('Game not active');
-    
-    const state = room.gameState;
-    const currentPlayer = state.players[state.currentPlayerIndex];
-    if (currentPlayer.id !== playerId) throw new Error('Not your turn');
-
-    let newState = state;
-
-    try {
-        if (action.type === 'PLAY_CARD') {
-            const { cardId, targetPlayerId, targetOrganId, targetPlayerId2, targetOrganId2 } = action.payload;
-            
-            // 1. Security check: ownership
-            const card = currentPlayer.hand.find(c => c.id === cardId);
-            if (!card) throw new Error('Card not in hand');
-
-            // 2. Server-side authoritative validation
-            if (!canPlayCard(state, card, playerId, targetPlayerId, targetOrganId, targetPlayerId2, targetOrganId2)) {
-                throw new Error('Illegal move');
-            }
-
-            newState = playCard(state, cardId, targetPlayerId, targetOrganId, targetPlayerId2, targetOrganId2);
-        } else if (action.type === 'DISCARD') {
-            newState = discardCards(state, action.payload.cardIds);
-        } else if (action.type === 'DRAW') {
-            if (state.needsDrawing) {
-                newState = drawCard(state);
-            }
-        } else if (action.type === 'PASS_TURN') {
-            if (currentPlayer.hand.length === 0) {
-                 newState = endTurn(state);
-            }
-        }
-        
-        room.gameState = newState;
-        room.lastActivity = Date.now();
-        if (newState.winner) {
-            room.status = 'finished';
-        }
-        return newState;
-    } catch (e) {
-        console.error(e);
-        throw new Error('Invalid action');
+    if (!room || room.status !== 'playing' || !room.gameState) {
+        throw new Error('Game not active');
     }
+    
+    const request: ActionRequest = { playerId, action };
+    
+    // The engine handles validation and reduction in one pure step
+    // (though validateAction is called inside reduceGameState)
+    const nextState = reduceGameState(room.gameState, request);
+    
+    // If state didn't change, it means validation failed or action did nothing
+    if (nextState === room.gameState) {
+        throw new Error('Action rejected by engine');
+    }
+
+    room.gameState = nextState;
+    room.lastActivity = Date.now();
+
+    if (nextState.winnerId) {
+        room.status = 'finished';
+    }
+
+    return nextState;
 };
 
 export const cleanupRooms = () => {
