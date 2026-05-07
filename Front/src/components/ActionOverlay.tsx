@@ -80,7 +80,7 @@ export const ActionOverlay: React.FC<ActionOverlayProps> = ({
                 onClick={onClear} 
                 className="p-2 md:p-3 bg-white/5 hover:bg-white/10 rounded-full text-white/30 hover:text-white transition-all self-start shrink-0"
               >
-                <CheckCircle2 size={20} md:size={24} />
+                <CheckCircle2 className="w-5 h-5 md:w-6 md:h-6" />
               </button>
             </div>
           </div>

@@ -53,7 +53,7 @@ export const GameHeader: React.FC<GameHeaderProps> = ({
           onClick={onShowLogs} 
           className="p-2 md:p-3 rounded-xl md:rounded-2xl bg-slate-800/50 border border-white/10 hover:bg-slate-700 active:scale-90 transition-all shadow-lg"
         >
-          <ScrollText size={16} md:size={20} className={showLogsActive ? "text-blue-400" : "text-white/60"} />
+          <ScrollText className={cn("w-4 h-4 md:w-5 md:h-5", showLogsActive ? "text-blue-400" : "text-white/60")} />
         </button>
         
         <div 
@@ -63,7 +63,7 @@ export const GameHeader: React.FC<GameHeaderProps> = ({
             isMyTurn && isDrawingState ? "bg-yellow-500 border-black text-black scale-105" : "bg-slate-800/50 border-white/10 text-white/40"
           )}
         >
-           <Layers size={16} md:size={20} className={isMyTurn && isDrawingState ? "animate-bounce" : ""} />
+           <Layers className={cn("w-4 h-4 md:w-5 md:h-5", isMyTurn && isDrawingState ? "animate-bounce" : "")} />
            <span className="text-lg md:text-2xl font-black tracking-tighter leading-none">{deckCount}</span>
            {isMyTurn && isDrawingState && (
              <div className="absolute top-12 md:top-16 left-1/2 -translate-x-1/2 bg-yellow-400 text-black text-[8px] md:text-[10px] font-black px-2 py-1 md:px-3 md:py-1.5 rounded-full whitespace-nowrap shadow-2xl border-2 border-black/10 animate-pulse">
