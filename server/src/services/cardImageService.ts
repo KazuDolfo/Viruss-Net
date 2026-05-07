@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import type { CardImageMap } from '@shared/models';
+import type { CardImageMap } from '../../../shared/index';
 export type { CardImageMap };
 
 const DATA_DIR = path.join(__dirname, '../../data');

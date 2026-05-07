@@ -1,0 +1,14 @@
+{
+  "name": "virus-net-monorepo",
+  "private": true,
+  "workspaces": [
+    "shared",
+    "server",
+    "Front"
+  ],
+  "scripts": {
+    "install:all": "npm install",
+    "build:server": "npm run build --workspace=server",
+    "build:front": "npm run build --workspace=Front"
+  }
+}

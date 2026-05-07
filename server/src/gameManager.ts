@@ -1,5 +1,4 @@
-import { GameState, Player } from '@shared/models';
-import { initGame, drawCard, playCard, discardCards, endTurn, canPlayCard } from '@shared/engine';
+import { GameState, Player, initGame, drawCard, playCard, discardCards, endTurn, canPlayCard } from '../../shared/index';
 
 interface Room {
     id: string;

@@ -16,6 +16,7 @@
     "react-dom": "^19.2.5",
     "socket.io-client": "^4.8.3",
     "tailwind-merge": "^3.5.0",
+    "@virus/shared": "*",
     "zustand": "^5.0.13"
   },
   "devDependencies": {

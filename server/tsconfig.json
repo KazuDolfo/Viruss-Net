@@ -10,7 +10,7 @@
     "baseUrl": ".",
     "ignoreDeprecations": "6.0",
     "paths": {
-      "@shared/*": ["../shared/*"]
+      "@shared": ["../shared/index.ts"]
     }
   },
   "include": ["src", "../shared"]
