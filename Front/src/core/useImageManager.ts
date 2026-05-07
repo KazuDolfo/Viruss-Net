@@ -1,0 +1,128 @@
+import { create } from 'zustand';
+import { socket } from './socket';
+import type { CardImageMap } from '@shared/models';
+
+export type { CardImageMap };
+
+interface ImageState {
+  images: CardImageMap;
+  isLoaded: boolean;
+  preloadedUrls: Set<string>;
+  loadProgress: number;
+  error: string | null;
+  
+  // Actions
+  fetchImages: () => Promise<void>;
+  preloadAll: () => Promise<void>;
+  updateImage: (key: keyof CardImageMap, url: string, password?: string) => Promise<{ success: boolean; error?: string }>;
+}
+
+const API_BASE_URL = 'https://virus-backend-8nvg.onrender.com';
+
+const DEFAULT_IMAGES: CardImageMap = {
+  heart: "https://res.cloudinary.com/diva0hfgm/image/upload/w_400,q_auto,f_auto/v1778033199/carta.virus2__bzfaqy.jpg",
+  brain: "",
+  stomach: "",
+  bone: "",
+  wildcard: "",
+  virus_red: "",
+  virus_green: "",
+  virus_blue: "",
+  virus_yellow: "",
+  virus_wildcard: "",
+  med_red: "",
+  med_green: "",
+  med_blue: "",
+  med_yellow: "",
+  med_wildcard: "",
+  sp_transplant: "",
+  sp_thief: "",
+  sp_infection: "",
+  sp_error: "",
+  sp_glove: "",
+};
+
+export const useImageManager = create<ImageState>((set, get) => {
+  
+  // Listen for socket updates
+  socket.on('card_images_updated', (updatedImages: CardImageMap) => {
+    set({ images: { ...DEFAULT_IMAGES, ...updatedImages } });
+  });
+
+  return {
+    images: DEFAULT_IMAGES,
+    isLoaded: false,
+    preloadedUrls: new Set(),
+    loadProgress: 0,
+    error: null,
+
+    fetchImages: async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/card-images`);
+        if (!response.ok) throw new Error('Failed to fetch images');
+        const data = await response.json();
+        set({ images: { ...DEFAULT_IMAGES, ...data }, error: null });
+      } catch (err: any) {
+        console.error('Error fetching images:', err);
+        set({ error: 'Usando imágenes locales por defecto' });
+      }
+    },
+
+    preloadAll: async () => {
+      const { images, preloadedUrls } = get();
+      const urlsToLoad = (Object.values(images).filter(url => typeof url === 'string' && url !== '' && !preloadedUrls.has(url)) as string[]);
+      
+      if (urlsToLoad.length === 0) {
+        set({ isLoaded: true, loadProgress: 100 });
+        return;
+      }
+
+      set({ isLoaded: false, loadProgress: 0 });
+      let loadedCount = 0;
+
+      const promises = urlsToLoad.map((url: string) => {
+        return new Promise((resolve) => {
+          const img = new Image();
+          img.src = url;
+          img.onload = () => {
+            loadedCount++;
+            set({ 
+              loadProgress: Math.round((loadedCount / urlsToLoad.length) * 100),
+              preloadedUrls: new Set<string>([...get().preloadedUrls, url])
+            });
+            resolve(url);
+          };
+          img.onerror = () => {
+            loadedCount++;
+            set({ loadProgress: Math.round((loadedCount / urlsToLoad.length) * 100) });
+            resolve(url); // Resolve anyway to not block
+          };
+        });
+      });
+
+      await Promise.all(promises);
+      set({ isLoaded: true, loadProgress: 100 });
+    },
+
+    updateImage: async (key, url, password = 'virus') => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/card-images/${String(key)}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ imageUrl: url, password }),
+        });
+
+        if (!response.ok) {
+          const data = await response.json();
+          throw new Error(data.error || 'Update failed');
+        }
+
+        const updatedImages = await response.json();
+        set({ images: updatedImages });
+        return { success: true };
+      } catch (err: any) {
+        return { success: false, error: err.message };
+      }
+    }
+  };
+});
