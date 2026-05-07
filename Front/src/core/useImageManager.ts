@@ -20,7 +20,7 @@ interface ImageState {
 const API_BASE_URL = 'https://virus-backend-8nvg.onrender.com';
 
 const DEFAULT_IMAGES: CardImageMap = {
-  heart: "https://res.cloudinary.com/diva0hfgm/image/upload/w_400,q_auto,f_auto/v1778033199/carta.virus2__bzfaqy.jpg",
+  heart: "",
   brain: "",
   stomach: "",
   bone: "",

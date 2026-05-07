@@ -31,7 +31,7 @@ export const useGameActions = () => {
         roomId: roomCode, 
         playerId, 
         sessionToken: session.sessionToken, 
-        action: { type, payload } 
+        action: { type, ...payload } 
       });
     } else {
       console.error('❌ Cannot send action: Missing context', { roomCode, playerId, hasToken: !!session.sessionToken });

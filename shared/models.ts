@@ -82,11 +82,26 @@ export type PassTurnAction = {
   type: 'PASS_TURN';
 };
 
+export type PlayCardAction = {
+  type: 'PLAY_CARD';
+  cardId: string;
+  targetPlayerId?: string;
+  targetOrganId?: string;
+  targetPlayerId2?: string;
+  targetOrganId2?: string;
+};
+
+export type DrawAction = {
+  type: 'DRAW';
+};
+
 export type GameAction = 
   | PlayOrganAction 
   | PlayVirusAction 
   | PlayMedicineAction 
   | PlayTreatmentAction 
+  | PlayCardAction
+  | DrawAction
   | DiscardAction 
   | PassTurnAction;
 

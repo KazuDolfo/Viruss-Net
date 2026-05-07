@@ -4,17 +4,24 @@ import { Server, Socket } from 'socket.io';
 import cors from 'cors';
 import { createRoom, joinRoom, startGame, getRoom, processAction, cleanupRooms } from './gameManager';
 import cardImagesRouter from './routes/cardImages';
+import { logger } from './core/logger';
 
 const app = express();
 
 app.use(express.json());
+
+// Request logging middleware
+app.use((req, res, next) => {
+  logger.info(`${req.method} ${req.url}`);
+  next();
+});
 
 // Self-ping to keep Render Free instance alive
 const RENDER_EXTERNAL_URL = process.env.RENDER_EXTERNAL_URL;
 if (RENDER_EXTERNAL_URL) {
   setInterval(() => {
     fetch(`${RENDER_EXTERNAL_URL}/health`)
-      .catch(err => console.error('Keep-alive ping failed:', err.message));
+      .catch(err => logger.error('Keep-alive ping failed:', { message: err.message }));
   }, 10 * 60 * 1000); // Every 10 minutes
 }
 
@@ -24,7 +31,7 @@ app.get('/health', (req, res) => {
 });
 
 app.use(cors({
-  origin: '*', // En producción podrías restringirlo al dominio del front
+  origin: '*', 
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
 }));
 
@@ -37,7 +44,6 @@ const io = new Server(server, {
     methods: ['GET', 'POST'],
     credentials: true
   },
-  // Recomendado para evitar problemas de buffering en algunos hosts
   pingTimeout: 60000,
 });
 
@@ -47,10 +53,11 @@ app.set('io', io);
 setInterval(cleanupRooms, 15 * 60 * 1000);
 
 io.on('connection', (socket: Socket) => {
-  console.log('User connected:', socket.id);
+  logger.info('User connected', { socketId: socket.id });
 
   socket.on('join_room', ({ roomId, playerName, playerId, sessionToken }) => {
     try {
+        logger.info('Player joining room', { roomId, playerName, playerId });
         const room = joinRoom(roomId, { 
             id: playerId, 
             name: playerName, 
@@ -69,12 +76,14 @@ io.on('connection', (socket: Socket) => {
             socket.emit('game_update', sanitizeState(room.gameState, playerId));
         }
     } catch (e: any) {
+        logger.error('Join room failed', { error: e.message, roomId, playerId });
         socket.emit('error', e.message);
     }
   });
 
   socket.on('start_game', ({ roomId }) => {
     try {
+        logger.info('Starting game', { roomId });
         const state = startGame(roomId);
         if (state) {
             const room = getRoom(roomId);
@@ -87,12 +96,14 @@ io.on('connection', (socket: Socket) => {
             });
         }
     } catch (e: any) {
+        logger.error('Start game failed', { error: e.message, roomId });
         socket.emit('error', e.message);
     }
   });
 
   socket.on('play_action', ({ roomId, playerId, sessionToken, action }) => {
     try {
+        logger.info('Processing action', { roomId, playerId, actionType: action.type });
         const room = getRoom(roomId);
         if (!room) throw new Error('Room not found');
         
@@ -101,7 +112,6 @@ io.on('connection', (socket: Socket) => {
             throw new Error('Unauthorized: Invalid session');
         }
 
-        // Update socket ID in case they reconnected
         player.socketId = socket.id;
 
         const newState = processAction(roomId, playerId, action);
@@ -112,15 +122,17 @@ io.on('connection', (socket: Socket) => {
 
         if (newState.winnerId) {
             const winner = newState.players.find(p => p.id === newState.winnerId);
+            logger.info('Game Over', { roomId, winner: winner?.name });
             io.to(roomId).emit('game_over', { winner: winner ? winner.name : 'Unknown' });
         }
     } catch (e: any) {
+        logger.error('Action failed', { error: e.message, roomId, playerId, action });
         socket.emit('error', e.message);
     }
   });
 
   socket.on('disconnect', () => {
-    console.log('User disconnected:', socket.id);
+    logger.info('User disconnected', { socketId: socket.id });
   });
 });
 

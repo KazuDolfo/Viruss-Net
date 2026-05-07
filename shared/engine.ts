@@ -42,18 +42,39 @@ export const validateAction = (state: GameState, request: ActionRequest): string
     const hasCard = player.hand.some(c => c.id === action.cardId);
     if (!hasCard) return ERRORS.CARD_NOT_IN_HAND;
   } else if (action.type === 'DISCARD') {
+    if (!action.cardIds || !Array.isArray(action.cardIds)) return ERRORS.NOT_ENOUGH_CARDS;
     const hasAllCards = action.cardIds.every(id => player.hand.some(c => c.id === id));
     if (!hasAllCards) return ERRORS.CARD_NOT_IN_HAND;
   }
 
   switch (action.type) {
+    case 'PLAY_CARD': {
+      const card = player.hand.find(c => c.id === action.cardId)!;
+      if (card.type === 'organ') {
+        return validateAction(state, { ...request, action: { type: 'PLAY_ORGAN', cardId: card.id } });
+      }
+      if (card.type === 'virus') {
+        if (!action.targetPlayerId || !action.targetOrganId) return ERRORS.INVALID_TARGET;
+        return validateAction(state, { ...request, action: { type: 'PLAY_VIRUS', cardId: card.id, target: { playerId: action.targetPlayerId, organId: action.targetOrganId } } });
+      }
+      if (card.type === 'medicine') {
+        if (!action.targetPlayerId || !action.targetOrganId) return ERRORS.INVALID_TARGET;
+        return validateAction(state, { ...request, action: { type: 'PLAY_MEDICINE', cardId: card.id, target: { playerId: action.targetPlayerId, organId: action.targetOrganId } } });
+      }
+      if (card.type === 'treatment') {
+        const targets: Target[] = [];
+        if (action.targetPlayerId) targets.push({ playerId: action.targetPlayerId, organId: action.targetOrganId });
+        if (action.targetPlayerId2) targets.push({ playerId: action.targetPlayerId2, organId: action.targetOrganId2 });
+        return validateAction(state, { ...request, action: { type: 'PLAY_TREATMENT', cardId: card.id, targets } });
+      }
+      return ERRORS.INVALID_TARGET;
+    }
+
     case 'PLAY_ORGAN': {
       const card = player.hand.find(c => c.id === action.cardId)!;
-      // Check if player already has this color (wildcard is its own color or depends on implementation)        
-      // Usually, one of each color. Wildcard organ is a 5th unique type.
       const alreadyHasColor = player.body.some(o => o.organCard.color === card.color);
       if (alreadyHasColor) return ERRORS.ORGAN_ALREADY_EXISTS;
-      if (player.body.length >= 5) return ERRORS.BODY_FULL; // 4 colors + 1 wild
+      if (player.body.length >= 5) return ERRORS.BODY_FULL; 
       return null;
     }
 
@@ -65,11 +86,15 @@ export const validateAction = (state: GameState, request: ActionRequest): string
       if (!targetOrgan) return ERRORS.INVALID_TARGET;
       if (targetOrgan.isImmune) return ERRORS.IMMUNE_TARGET;
 
-      // Color matching: wild card can infect anything, wild organ can be infected by anything
       const colorMatch = card.color === 'wildcard' ||
                          targetOrgan.organCard.color === 'wildcard' ||
                          card.color === targetOrgan.organCard.color;
       if (!colorMatch) return ERRORS.COLOR_MISMATCH;
+      
+      // Can't put a virus of a color if it already has one of THAT color? 
+      // Rules: max 2 viruses total. Usually same color as organ.
+      if (targetOrgan.viruses.length >= 2) return ERRORS.INVALID_TARGET;
+
       return null;
     }
 
@@ -85,6 +110,9 @@ export const validateAction = (state: GameState, request: ActionRequest): string
                          targetOrgan.organCard.color === 'wildcard' ||
                          card.color === targetOrgan.organCard.color;
       if (!colorMatch) return ERRORS.COLOR_MISMATCH;
+      
+      if (targetOrgan.medicines.length >= 2) return ERRORS.INVALID_TARGET;
+
       return null;
     }
 
@@ -99,8 +127,11 @@ export const validateAction = (state: GameState, request: ActionRequest): string
     case 'PASS_TURN':
       return null;
 
+    case 'DRAW':
+      return null;
+
     default:
-      return 'AcciÃ³n desconocida';
+      return 'Acción desconocida';
   }
 };
 
@@ -163,14 +194,12 @@ const validateTreatment = (state: GameState, player: Player, card: Card, targets
 export const reduceGameState = (state: GameState, request: ActionRequest): GameState => {
   const error = validateAction(state, request);
   if (error) {
-    // In a real authoritative backend, we might throw or return an error state.
-    // For this engine, we'll return the state unchanged if invalid.
     console.error(`AcciÃ³n invÃ¡lida: ${error}`);
     return state;
   }
 
   let newState = { ...state };
-  const { playerId, action } = request;
+  let { playerId, action } = request;
   const playerIndex = newState.players.findIndex(p => p.id === playerId);
 
   // Clone players to ensure immutability
@@ -180,6 +209,24 @@ export const reduceGameState = (state: GameState, request: ActionRequest): GameS
     body: p.body.map(o => ({ ...o, viruses: [...o.viruses], medicines: [...o.medicines] }))
   }));
   const currentPlayer = players[playerIndex];
+
+  // Map PLAY_CARD to specific actions
+  if (action.type === 'PLAY_CARD') {
+    const act = action as any; 
+    const card = currentPlayer.hand.find(c => c.id === act.cardId)!;
+    if (card.type === 'organ') {
+      action = { type: 'PLAY_ORGAN', cardId: card.id };
+    } else if (card.type === 'virus') {
+      action = { type: 'PLAY_VIRUS', cardId: card.id, target: { playerId: act.targetPlayerId!, organId: act.targetOrganId! } };
+    } else if (card.type === 'medicine') {
+      action = { type: 'PLAY_MEDICINE', cardId: card.id, target: { playerId: act.targetPlayerId!, organId: act.targetOrganId! } };
+    } else if (card.type === 'treatment') {
+      const targets: Target[] = [];
+      if (act.targetPlayerId) targets.push({ playerId: act.targetPlayerId, organId: act.targetOrganId });
+      if (act.targetPlayerId2) targets.push({ playerId: act.targetPlayerId2, organId: act.targetOrganId2 });
+      action = { type: 'PLAY_TREATMENT', cardId: card.id, targets };
+    }
+  }
 
   // Execute action logic
   switch (action.type) {
@@ -252,6 +299,7 @@ export const reduceGameState = (state: GameState, request: ActionRequest): GameS
     }
 
     case 'PASS_TURN':
+    case 'DRAW':
       break;
   }
 

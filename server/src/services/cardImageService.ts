@@ -7,7 +7,7 @@ const DATA_DIR = path.join(__dirname, '../../data');
 const FILE_PATH = path.join(DATA_DIR, 'card-images.json');
 
 const DEFAULT_IMAGES: CardImageMap = {
-  heart: "https://res.cloudinary.com/diva0hfgm/image/upload/w_400,q_auto,f_auto/v1778033199/carta.virus2__bzfaqy.jpg",
+  heart: "",
   brain: "",
   stomach: "",
   bone: "",
