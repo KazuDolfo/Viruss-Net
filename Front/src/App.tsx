@@ -132,7 +132,19 @@ const App: React.FC = () => {
 
   const neverTargetPlayer = useCallback(() => false, []);
 
-  // 5. Conditional Rendering: Lobby
+  // 5. Game State Derived Info
+  // Move this before conditional returns to avoid Rules of Hooks violation (Error #310)
+  const rivals = useMemo(() => {
+    if (!gameState) return [];
+    const myIndex = gameState.players.findIndex(p => p.id === playerId);
+    if (myIndex === -1) return gameState.players;
+    return [
+      ...gameState.players.slice(myIndex + 1),
+      ...gameState.players.slice(0, myIndex)
+    ];
+  }, [gameState?.players, playerId]);
+
+  // 6. Conditional Rendering: Lobby
   if (roomStatus === 'waiting' || !gameState || !currentPlayer) {
     return (
       <div className="min-h-svh bg-slate-900 text-white flex flex-col items-center justify-center p-4 xs:p-8">
@@ -170,17 +182,8 @@ const App: React.FC = () => {
     );
   }
 
-  // 6. Game State Derived Info
+  // 7. Render Game Stage
   const myPlayer = gameState.players.find(p => p.id === playerId)!;
-
-  // Reorder rivals starting from the player after me
-  const rivals = useMemo(() => {
-    const myIndex = gameState.players.findIndex(p => p.id === playerId);
-    return [
-      ...gameState.players.slice(myIndex + 1),
-      ...gameState.players.slice(0, myIndex)
-    ];
-  }, [gameState.players, playerId]);
 
   return (
     <div className="fixed inset-0 bg-[#0b1120] text-white overflow-hidden flex flex-col font-sans select-none touch-manipulation">
