@@ -8,6 +8,7 @@ interface GameStore {
   roomPlayers: { id: string, name: string }[];
   roomStatus: 'waiting' | 'playing' | 'finished';
   isDrawingState: boolean;
+  isConnected: boolean;
   
   // Actions
   setGameState: (state: GameState) => void;
@@ -16,6 +17,7 @@ interface GameStore {
   setPlayerId: (id: string) => void;
   setRoomCode: (code: string | null) => void;
   setIsDrawingState: (isDrawing: boolean) => void;
+  setIsConnected: (connected: boolean) => void;
   resetStore: () => void;
 }
 
@@ -26,6 +28,7 @@ export const useGameStore = create<GameStore>((set) => ({
   roomPlayers: [],
   roomStatus: 'waiting',
   isDrawingState: false,
+  isConnected: false,
 
   setGameState: (gameState) => set({ gameState }),
   setRoomPlayers: (roomPlayers) => set({ roomPlayers }),
@@ -33,12 +36,14 @@ export const useGameStore = create<GameStore>((set) => ({
   setPlayerId: (playerId) => set({ playerId }),
   setRoomCode: (roomCode) => set({ roomCode }),
   setIsDrawingState: (isDrawingState) => set({ isDrawingState }),
+  setIsConnected: (isConnected) => set({ isConnected }),
   
   resetStore: () => set({ 
     gameState: null, 
     roomCode: null, 
     roomPlayers: [],
     roomStatus: 'waiting',
-    isDrawingState: false 
+    isDrawingState: false,
+    isConnected: false
   }),
 }));

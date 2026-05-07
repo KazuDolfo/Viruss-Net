@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, memo } from 'react';
-import type { Card, CardColor } from '@shared/models';
+import type { Card } from '@shared/models';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { Heart, Brain, Utensils, Bone, Zap, Shield, Skull, Layers, CheckCircle2, AlertCircle } from 'lucide-react';
@@ -19,12 +19,11 @@ interface CardUIProps {
   className?: string;
 }
 
-export const colorMap: Record<CardColor, string> = {
+export const colorMap: Record<string, string> = {
   red: 'from-red-500 to-red-700 border-red-800',
   blue: 'from-blue-500 to-blue-700 border-blue-800',
   green: 'from-green-500 to-green-700 border-green-800',
-  yellow: 'from-yellow-400 to-yellow-600 border-yellow-700',
-  multicolor: 'from-purple-500 via-pink-500 to-red-500 border-purple-800'
+  yellow: 'from-yellow-400 to-yellow-600 border-yellow-700'
 };
 
 const organTheme: Record<string, { icon: any; color: string; label: string }> = {
@@ -54,8 +53,8 @@ const CardUIBase: React.FC<CardUIProps> = ({ card, onClick, selected, disabled, 
   
   // Memoized key resolution
   const organKey = useMemo((): keyof CardImageMap => {
-    // 1. Special cards (Checked first for precise matching)
-    if (card.type === 'special') {
+    // 1. Treatment cards (Checked first for precise matching)
+    if (card.type === 'treatment' as any) {
       if (cardNameLower.includes('transplante') || cardNameLower.includes('trasplante')) return 'sp_transplant';
       if (cardNameLower.includes('ladrón')) return 'sp_thief';
       if (cardNameLower.includes('contagio')) return 'sp_infection';
@@ -117,10 +116,11 @@ const CardUIBase: React.FC<CardUIProps> = ({ card, onClick, selected, disabled, 
     <div
       onClick={!disabled ? onClick : undefined}
       className={cn(
-        'relative flex flex-col items-center justify-between rounded-[1.2rem] border-4 p-2 transition-all cursor-pointer shadow-xl select-none touch-manipulation aspect-[2/3] overflow-hidden group bg-gradient-to-b',
+        'relative flex flex-col items-center justify-between rounded-[1rem] border-[3px] p-2 transition-all cursor-pointer shadow-xl select-none touch-manipulation overflow-hidden group bg-gradient-to-b will-change-transform',
         colorMap[card.color],
-        small ? 'w-16 h-24' : 'w-36 md:w-44',
-        selected ? 'ring-4 ring-white -translate-y-2 z-20 scale-105' : 'hover:scale-105 active:scale-95',
+        small ? 'w-16 h-24' : 'w-full max-w-[160px]',
+        'aspect-[2/3]',
+        selected ? 'ring-4 ring-white -translate-y-4 scale-105 z-20' : 'hover:-translate-y-2 hover:scale-[1.02]',
         disabled && 'opacity-40 grayscale cursor-not-allowed',
         className
       )}

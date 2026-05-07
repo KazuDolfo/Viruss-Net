@@ -36,7 +36,7 @@ const OrganSlotBase: React.FC<OrganSlotProps> = ({ organ, onClick, canTarget, is
         "absolute top-0 -left-1 md:-left-2 flex flex-col gap-1 z-20",
         small ? "scale-75 origin-top-right" : ""
       )}>
-        {organ.virus.map((v: any, i: number) => (
+        {organ.viruses.map((v: any, i: number) => (
           <CardUI key={v.id} card={v} small className={cn("shadow-md border-white/20", i > 0 && "-mt-12 md:-mt-16")} />
         ))}
       </div>
