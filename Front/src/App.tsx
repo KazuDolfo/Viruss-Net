@@ -92,8 +92,9 @@ const App: React.FC = () => {
 
   const getCardHint = useCallback((card: any) => {
     if (card.description) {
-        if (card.name === 'Transplante' && pendingTargets.length === 0) return "Selecciona el PRIMER órgano a intercambiar.";
-        if (card.name === 'Transplante' && pendingTargets.length === 1) return "Selecciona el SEGUNDO órgano.";
+        const normalizedName = (card.name || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        if ((normalizedName.includes('transplante') || normalizedName.includes('trasplante')) && pendingTargets.length === 0) return "Selecciona el PRIMER órgano a intercambiar.";
+        if ((normalizedName.includes('transplante') || normalizedName.includes('trasplante')) && pendingTargets.length === 1) return "Selecciona el SEGUNDO órgano.";
         return card.description;
     }
     if (card.type === 'organ') return "¡Bájalo a tu zona!";
@@ -134,7 +135,11 @@ const App: React.FC = () => {
   const isDrawingState = false; // needsDrawing removed from backend
 
   const canTargetOrgan = (_pid: string, _oid: string) => isMyTurn && selectedCards.length === 1 && !isDrawingState;
-  const canTargetPlayer = (_pid: string) => isMyTurn && selectedCards.length === 1 && selectedCards[0].name === 'Error médico';
+  const canTargetPlayer = (_pid: string) => {
+    if (!isMyTurn || selectedCards.length !== 1) return false;
+    const normalizedName = (selectedCards[0].name || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    return normalizedName.includes('error');
+  };
 
   const winnerPlayer = gameState.winnerId ? gameState.players.find(p => p.id === gameState.winnerId) : null;
 

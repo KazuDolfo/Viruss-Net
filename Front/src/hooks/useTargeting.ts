@@ -35,9 +35,10 @@ export const useTargeting = () => {
   const handleOrganClick = useCallback((targetPlayerId: string, organId: string) => {
     if (!gameState || !playerId || selectedCards.length !== 1) return;
     const selectedCard = selectedCards[0];
+    const normalizedName = (selectedCard.name || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
     // Transplante Logic
-    if (selectedCard.name === 'Transplante') {
+    if (normalizedName.includes('transplante') || normalizedName.includes('trasplante')) {
       const alreadySelected = pendingTargets.find(t => t.playerId === targetPlayerId && t.organId === organId);
       if (alreadySelected) {
         setPendingTargets(prev => prev.filter(t => t !== alreadySelected));
@@ -68,7 +69,9 @@ export const useTargeting = () => {
   const playSpecialGlobal = useCallback(() => {
     if (!gameState || !playerId || selectedCards.length !== 1) return;
     const selectedCard = selectedCards[0];
-    if (selectedCard.name === 'Guante de látex' || selectedCard.name === 'Contagio') {
+    const normalizedName = (selectedCard.name || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    
+    if (normalizedName.includes('guante') || normalizedName.includes('contagio')) {
       sendAction('PLAY_CARD', { cardId: selectedCard.id });
       clearSelection();
     }
@@ -77,7 +80,9 @@ export const useTargeting = () => {
   const handlePlayerTarget = useCallback((targetPlayerId: string) => {
     if (!gameState || !playerId || selectedCards.length !== 1) return;
     const selectedCard = selectedCards[0];
-    if (selectedCard.name === 'Error médico') {
+    const normalizedName = (selectedCard.name || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    
+    if (normalizedName.includes('error')) {
       sendAction('PLAY_CARD', { cardId: selectedCard.id, targetPlayerId });
       clearSelection();
     }

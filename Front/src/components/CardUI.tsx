@@ -49,53 +49,59 @@ const CardUIBase: React.FC<CardUIProps> = ({ card, onClick, selected, disabled, 
   const images = useImageManager(state => state.images);
   const preloadedUrls = useImageManager(state => state.preloadedUrls);
   
-  const cardNameLower = card.name.toLowerCase();
+  // Normalized name for robust matching (removes accents and converts to lowercase)
+  const normalizedName = useMemo(() => {
+    return (card.name || '')
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+  }, [card.name]);
   
   // Memoized key resolution
   const organKey = useMemo((): keyof CardImageMap => {
     // 1. Treatment cards (Checked first for precise matching)
     if (card.type === 'treatment' as any || card.type === 'special' as any) {
-      if (cardNameLower.includes('transplante') || cardNameLower.includes('trasplante')) return 'sp_transplant';
-      if (cardNameLower.includes('ladrón')) return 'sp_thief';
-      if (cardNameLower.includes('contagio')) return 'sp_infection';
-      if (cardNameLower.includes('error')) return 'sp_error';
-      if (cardNameLower.includes('guante')) return 'sp_glove';
+      if (normalizedName.includes('transplante') || normalizedName.includes('trasplante')) return 'sp_transplant';
+      if (normalizedName.includes('ladron')) return 'sp_thief';
+      if (normalizedName.includes('contagio')) return 'sp_infection';
+      if (normalizedName.includes('error')) return 'sp_error';
+      if (normalizedName.includes('guante')) return 'sp_glove';
     }
 
     // 2. Organs
-    if (cardNameLower.includes('heart') || cardNameLower.includes('corazón')) return 'heart';
-    if (cardNameLower.includes('brain') || cardNameLower.includes('cerebro')) return 'brain';
-    if (cardNameLower.includes('stomach') || cardNameLower.includes('estómago')) return 'stomach';
-    if (cardNameLower.includes('bones') || cardNameLower.includes('huesos')) return 'bone';
-    if (cardNameLower.includes('comodín') && card.type === 'organ') return 'wildcard';
+    if (normalizedName.includes('heart') || normalizedName.includes('corazon')) return 'heart';
+    if (normalizedName.includes('brain') || normalizedName.includes('cerebro')) return 'brain';
+    if (normalizedName.includes('stomach') || normalizedName.includes('estomago')) return 'stomach';
+    if (normalizedName.includes('bones') || normalizedName.includes('huesos')) return 'bone';
+    if (normalizedName.includes('comodin') && card.type === 'organ') return 'wildcard';
     
     // 3. Virus
     if (card.type === 'virus') {
-       if (cardNameLower.includes('rojo')) return 'virus_red';
-       if (cardNameLower.includes('verde')) return 'virus_green';
-       if (cardNameLower.includes('azul')) return 'virus_blue';
-       if (cardNameLower.includes('amarillo')) return 'virus_yellow';
-       if (cardNameLower.includes('comodín')) return 'virus_wildcard';
+       if (normalizedName.includes('rojo')) return 'virus_red';
+       if (normalizedName.includes('verde')) return 'virus_green';
+       if (normalizedName.includes('azul')) return 'virus_blue';
+       if (normalizedName.includes('amarillo')) return 'virus_yellow';
+       if (normalizedName.includes('comodin')) return 'virus_wildcard';
     }
 
     // 4. Medicine
     if (card.type === 'medicine') {
-       if (cardNameLower.includes('roja')) return 'med_red';
-       if (cardNameLower.includes('verde')) return 'med_green';
-       if (cardNameLower.includes('azul')) return 'med_blue';
-       if (cardNameLower.includes('amarilla')) return 'med_yellow';
-       if (cardNameLower.includes('comodín')) return 'med_wildcard';
+       if (normalizedName.includes('roja')) return 'med_red';
+       if (normalizedName.includes('verde')) return 'med_green';
+       if (normalizedName.includes('azul')) return 'med_blue';
+       if (normalizedName.includes('amarilla')) return 'med_yellow';
+       if (normalizedName.includes('comodin')) return 'med_wildcard';
     }
 
     // Special catch-all for names if type check failed
-    if (cardNameLower.includes('transplante') || cardNameLower.includes('trasplante')) return 'sp_transplant';
-    if (cardNameLower.includes('ladrón')) return 'sp_thief';
-    if (cardNameLower.includes('contagio')) return 'sp_infection';
-    if (cardNameLower.includes('error')) return 'sp_error';
-    if (cardNameLower.includes('guante')) return 'sp_glove';
+    if (normalizedName.includes('transplante') || normalizedName.includes('trasplante')) return 'sp_transplant';
+    if (normalizedName.includes('ladron')) return 'sp_thief';
+    if (normalizedName.includes('contagio')) return 'sp_infection';
+    if (normalizedName.includes('error')) return 'sp_error';
+    if (normalizedName.includes('guante')) return 'sp_glove';
 
     return 'heart';
-  }, [cardNameLower, card.type]);
+  }, [normalizedName, card.type]);
 
   const customUrl = images[organKey];
   const hasCustomImage = !!customUrl;
