@@ -123,17 +123,16 @@ const CardUIBase: React.FC<CardUIProps> = ({ card, onClick, selected, disabled, 
     <div
       onClick={!disabled ? onClick : undefined}
       className={cn(
-        'relative flex flex-col items-center justify-between rounded-[1rem] border-[3px] p-2 transition-all cursor-pointer shadow-xl select-none touch-manipulation overflow-hidden group bg-gradient-to-b will-change-transform',
+        'relative flex flex-col items-center justify-between rounded-[0.75rem] md:rounded-[1rem] border-[2px] md:border-[3px] p-1.5 md:p-2 transition-all cursor-pointer shadow-xl select-none touch-manipulation overflow-hidden group bg-gradient-to-b will-change-transform',
         colorMap[card.color],
-        small ? 'w-16 h-24' : 'w-full max-w-[160px]',
-        'aspect-[2/3]',
-        selected ? 'ring-4 ring-white -translate-y-4 scale-105 z-20' : 'hover:-translate-y-2 hover:scale-[1.02]',
+        small ? 'w-14 h-20 md:w-16 md:h-24' : 'w-[100px] h-[150px] xs:w-[120px] xs:h-[180px] md:w-[160px] md:h-[240px]',
+        selected ? 'ring-4 ring-white -translate-y-4 scale-105 z-20 shadow-[0_0_30px_rgba(255,255,255,0.4)]' : 'hover:-translate-y-2 hover:scale-[1.02]',
         disabled && 'opacity-40 grayscale cursor-not-allowed',
         className
       )}
     >
       {/* GLOSSY EFFECT */}
-      <div className="absolute inset-0 bg-gradient-to-tr from-white/20 via-transparent to-transparent opacity-40 pointer-events-none z-30" />
+      <div className="absolute inset-0 bg-gradient-to-tr from-white/20 via-transparent to-transparent opacity-30 md:opacity-40 pointer-events-none z-30" />
       
       {/* SKELETON / LOADING */}
       {isLoading && <CardSkeleton />}
@@ -155,8 +154,8 @@ const CardUIBase: React.FC<CardUIProps> = ({ card, onClick, selected, disabled, 
 
       {/* OVERLAY LABEL */}
       {showImage && (
-        <div className="absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-black/90 to-transparent z-20 flex items-end justify-center pb-2 px-1">
-          <span className="text-white font-black text-[10px] md:text-xs tracking-tighter uppercase text-center leading-none truncate w-full">
+        <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/90 via-black/40 to-transparent z-20 flex items-end justify-center pb-1.5 md:pb-2 px-1">
+          <span className="text-white font-black text-[8px] xs:text-[9px] md:text-xs tracking-tighter uppercase text-center leading-none truncate w-full drop-shadow-md">
             {card.name}
           </span>
         </div>
@@ -165,19 +164,19 @@ const CardUIBase: React.FC<CardUIProps> = ({ card, onClick, selected, disabled, 
       {/* BASE DESIGN / FALLBACK */}
       {showFallback && (
         <>
-          <div className="text-white font-black text-center leading-tight drop-shadow-lg z-20 w-full px-1 text-xs md:text-sm">
+          <div className="text-white font-black text-center leading-tight drop-shadow-lg z-20 w-full px-1 text-[10px] xs:text-xs md:text-sm">
             {card.name}
           </div>
           
           <div className="flex flex-1 items-center justify-center py-1 z-20 relative w-full">
             <div className={cn(
               "rounded-full flex items-center justify-center transition-all duration-500 group-hover:rotate-12",
-              small ? "p-1" : "p-4 bg-white/10 backdrop-blur-md border border-white/20 shadow-inner"
+              small ? "p-0.5" : "p-2 md:p-4 bg-white/10 backdrop-blur-md border border-white/20 shadow-inner"
             )}>
               <Icon 
                 className={cn(
                   "text-white drop-shadow-glow",
-                  small ? "w-6 h-6" : "w-12 h-12 md:w-16 md:h-16"
+                  small ? "w-5 h-5 md:w-6 md:h-6" : "w-10 h-10 xs:w-12 xs:h-12 md:w-16 md:h-16"
                 )} 
               />
             </div>
@@ -185,8 +184,8 @@ const CardUIBase: React.FC<CardUIProps> = ({ card, onClick, selected, disabled, 
 
           {!small && (
             <div className="w-full z-20">
-               <div className="bg-black/40 backdrop-blur-md rounded-lg py-1 px-2 border border-white/10 shadow-lg">
-                  <p className="text-[10px] text-white font-black text-center tracking-widest uppercase">
+               <div className="bg-black/40 backdrop-blur-md rounded-lg py-0.5 md:py-1 px-1.5 md:px-2 border border-white/10 shadow-lg">
+                  <p className="text-[8px] md:text-[10px] text-white font-black text-center tracking-widest uppercase truncate">
                     {theme?.label || card.type}
                   </p>
                </div>

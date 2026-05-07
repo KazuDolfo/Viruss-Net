@@ -25,21 +25,27 @@
   --z-overlay: 50;
   --z-modal: 100;
 
-  /* HUD Constraints */
-  --hand-height: clamp(120px, 20vh, 200px);
-  --card-aspect-ratio: 2/3;
+  /* HUD & Gaming Constraints */
+  --hand-height: clamp(120px, 20vh, 160px);
+  --board-stable-height: 100px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 body {
   margin: 0;
   overflow: hidden;
-  min-height: 100svh;
+  height: 100dvh;
   background-color: #0b1120;
+  touch-action: manipulation;
+  overscroll-behavior: none;
 }
 
 #root {
   width: 100%;
-  height: 100svh;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -47,8 +53,24 @@ body {
 
 /* Game Layers */
 .layer-bg { z-index: var(--z-bg); position: absolute; inset: 0; }
-.layer-world { z-index: var(--z-game-world); position: relative; }
-.layer-hud { z-index: var(--z-hud); position: fixed; pointer-events: none; }
+.layer-world { 
+  z-index: var(--z-game-world); 
+  position: relative; 
+  padding-top: calc(var(--safe-top) + 1rem);
+}
+.layer-hud { z-index: var(--z-hud); position: fixed; pointer-events: none; width: 100%; height: 100%; }
 .layer-hud > * { pointer-events: auto; }
 .layer-overlay { z-index: var(--z-overlay); position: fixed; inset: 0; pointer-events: none; }
 .layer-overlay > * { pointer-events: auto; }
+
+/* Mobile Tap Highlight Fix */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Stable Slot System */
+.slot-fixed {
+  width: 100%;
+  aspect-ratio: 2/3;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}

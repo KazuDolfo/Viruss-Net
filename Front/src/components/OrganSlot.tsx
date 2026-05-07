@@ -33,21 +33,37 @@ const OrganSlotBase: React.FC<OrganSlotProps> = ({ organ, onClick, canTarget, is
 
       {/* Virus layer */}
       <div className={cn(
-        "absolute top-0 -left-1 md:-left-2 flex flex-col gap-1 z-20",
-        small ? "scale-75 origin-top-right" : ""
+        "absolute top-0 -left-1 md:-left-2 flex flex-col gap-1 z-20 transition-all duration-300",
+        small ? "scale-[0.85] xs:scale-[0.9] origin-top-left" : ""
       )}>
         {organ.viruses.map((v: any, i: number) => (
-          <CardUI key={v.id} card={v} small className={cn("shadow-md border-white/20", i > 0 && "-mt-12 md:-mt-16")} />
+          <CardUI 
+            key={v.id} 
+            card={v} 
+            small 
+            className={cn(
+                "shadow-lg border-white/40 ring-1 ring-black/20", 
+                i > 0 && "-mt-14 md:-mt-16"
+            )} 
+          />
         ))}
       </div>
 
       {/* Medicines layer */}
       <div className={cn(
-        "absolute top-0 -right-1 md:-right-2 flex flex-col gap-1 z-20",
-        small ? "scale-75 origin-top-left" : ""
+        "absolute top-0 -right-1 md:-right-2 flex flex-col gap-1 z-20 transition-all duration-300",
+        small ? "scale-[0.85] xs:scale-[0.9] origin-top-right" : ""
       )}>
         {organ.medicines.map((m: any, i: number) => (
-          <CardUI key={m.id} card={m} small className={cn("shadow-md border-white/20", i > 0 && "-mt-12 md:-mt-16")} />
+          <CardUI 
+            key={m.id} 
+            card={m} 
+            small 
+            className={cn(
+                "shadow-lg border-white/40 ring-1 ring-black/20", 
+                i > 0 && "-mt-14 md:-mt-16"
+            )} 
+          />
         ))}
       </div>
 
