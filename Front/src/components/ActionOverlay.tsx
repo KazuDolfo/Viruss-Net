@@ -29,12 +29,12 @@ export const ActionOverlay: React.FC<ActionOverlayProps> = ({
 
   return (
     <div className={cn(
-      "fixed inset-x-0 bottom-0 z-50 p-4 pb-12 transition-transform duration-500 ease-out pointer-events-none",
-      isVisible ? "translate-y-0" : "translate-y-full"
+      "fixed inset-x-0 bottom-[var(--hand-height,180px)] z-50 p-4 pb-4 transition-transform duration-500 ease-out pointer-events-none",
+      isVisible ? "translate-y-0" : "translate-y-[200%]"
     )}>
       <div className="max-w-4xl mx-auto pointer-events-auto">
         {selectedCards.length === 1 && (
-          <div className="bg-slate-900/95 backdrop-blur-3xl p-6 rounded-[2.5rem] border-[3px] border-white/10 shadow-[0_-20px_50px_rgba(0,0,0,0.5)] animate-in slide-in-from-bottom-10">
+          <div className="bg-slate-900/80 backdrop-blur-2xl p-6 rounded-[2.5rem] border-[3px] border-white/10 shadow-[0_-20px_50px_rgba(0,0,0,0.5)] animate-in slide-in-from-bottom-10">
             <div className="flex gap-6 items-center">
               <div className="shrink-0 w-24 md:w-32">
                 <CardUI card={selectedCards[0]} />

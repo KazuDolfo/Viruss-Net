@@ -30,11 +30,11 @@ const CATEGORIES = [
   { id: 'med_blue', name: 'Medicina Azul', type: 'medicine', color: 'blue' },
   { id: 'med_yellow', name: 'Medicina Amarilla', type: 'medicine', color: 'yellow' },
   { id: 'med_wildcard', name: 'Medicina Comodín', type: 'medicine', color: 'multicolor' },
-  { id: 'sp_transplant', name: 'Transplante', type: 'special', color: 'multicolor' },
-  { id: 'sp_thief', name: 'Ladrón', type: 'special', color: 'multicolor' },
-  { id: 'sp_infection', name: 'Contagio', type: 'special', color: 'multicolor' },
-  { id: 'sp_error', name: 'Error Médico', type: 'special', color: 'multicolor' },
-  { id: 'sp_glove', name: 'Guante', type: 'special', color: 'multicolor' },
+  { id: 'sp_transplant', name: 'Transplante', type: 'treatment', color: 'multicolor' },
+  { id: 'sp_thief', name: 'Ladrón', type: 'treatment', color: 'multicolor' },
+  { id: 'sp_infection', name: 'Contagio', type: 'treatment', color: 'multicolor' },
+  { id: 'sp_error', name: 'Error Médico', type: 'treatment', color: 'multicolor' },
+  { id: 'sp_glove', name: 'Guante', type: 'treatment', color: 'multicolor' },
 ] as const;
 
 export const CardCollectionModal: React.FC<CardCollectionModalProps> = ({ isOpen, onClose }) => {

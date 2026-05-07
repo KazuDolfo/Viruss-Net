@@ -54,7 +54,7 @@ const CardUIBase: React.FC<CardUIProps> = ({ card, onClick, selected, disabled, 
   // Memoized key resolution
   const organKey = useMemo((): keyof CardImageMap => {
     // 1. Treatment cards (Checked first for precise matching)
-    if (card.type === 'treatment' as any) {
+    if (card.type === 'treatment' as any || card.type === 'special' as any) {
       if (cardNameLower.includes('transplante') || cardNameLower.includes('trasplante')) return 'sp_transplant';
       if (cardNameLower.includes('ladrón')) return 'sp_thief';
       if (cardNameLower.includes('contagio')) return 'sp_infection';
@@ -86,6 +86,13 @@ const CardUIBase: React.FC<CardUIProps> = ({ card, onClick, selected, disabled, 
        if (cardNameLower.includes('amarilla')) return 'med_yellow';
        if (cardNameLower.includes('comodín')) return 'med_wildcard';
     }
+
+    // Special catch-all for names if type check failed
+    if (cardNameLower.includes('transplante') || cardNameLower.includes('trasplante')) return 'sp_transplant';
+    if (cardNameLower.includes('ladrón')) return 'sp_thief';
+    if (cardNameLower.includes('contagio')) return 'sp_infection';
+    if (cardNameLower.includes('error')) return 'sp_error';
+    if (cardNameLower.includes('guante')) return 'sp_glove';
 
     return 'heart';
   }, [cardNameLower, card.type]);
