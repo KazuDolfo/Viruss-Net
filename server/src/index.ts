@@ -110,8 +110,9 @@ io.on('connection', (socket: Socket) => {
             io.to(p.socketId).emit('game_update', sanitizeState(newState, p.id));
         });
 
-        if (newState.winner) {
-            io.to(roomId).emit('game_over', { winner: newState.winner.name });
+        if (newState.winnerId) {
+            const winner = newState.players.find(p => p.id === newState.winnerId);
+            io.to(roomId).emit('game_over', { winner: winner ? winner.name : 'Unknown' });
         }
     } catch (e: any) {
         socket.emit('error', e.message);

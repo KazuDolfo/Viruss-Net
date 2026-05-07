@@ -1,52 +1,369 @@
-import type { Card, CardColor, CardType, GameState, Player, OrganState } from './models';
+import { 
+  GameState, 
+  GameAction, 
+  ActionRequest, 
+  Player, 
+  Card, 
+  OrganState, 
+  CardColor, 
+  Target
+} from './models';
 
-export const COLORS: CardColor[] = ['red', 'blue', 'green', 'yellow'];
+/**
+ * ERROR MESSAGES
+ */
+export const ERRORS = {
+  NOT_YOUR_TURN: 'No es tu turno',
+  INVALID_PHASE: 'Fase de juego invÃ¡lida para esta acciÃ³n',
+  CARD_NOT_IN_HAND: 'La carta no estÃ¡ en tu mano',
+  INVALID_TARGET: 'Objetivo invÃ¡lido',
+  ORGAN_ALREADY_EXISTS: 'Ya tienes un Ã³rgano de este color',
+  BODY_FULL: 'Cuerpo completo (mÃ¡ximo 4 Ã³rganos distintos)',
+  IMMUNE_TARGET: 'El objetivo estÃ¡ inmunizado',
+  COLOR_MISMATCH: 'El color de la carta no coincide con el Ã³rgano',
+  NOT_ENOUGH_CARDS: 'No tienes suficientes cartas para descartar',
+  GAME_OVER: 'El juego ya ha terminado',
+};
 
-export const createDeck = (): Card[] => {
-  const deck: Card[] = [];
-  let id = 0;
+/**
+ * VALIDATION LAYER
+ */
+export const validateAction = (state: GameState, request: ActionRequest): string | null => {
+  const { playerId, action } = request;
+  const player = state.players.find(p => p.id === playerId);
+  const currentPlayer = state.players[state.currentPlayerIndex];
 
-  const addCards = (type: CardType, color: CardColor, name: string, count: number) => {
-    for (let i = 0; i < count; i++) {
-      deck.push({ id: `${type}-${color}-${id++}`, type, color, name });
+  if (!player) return ERRORS.INVALID_TARGET;
+  if (state.winnerId) return ERRORS.GAME_OVER;
+  if (player.id !== currentPlayer.id) return ERRORS.NOT_YOUR_TURN;
+
+  // Basic ownership check for card-based actions
+  if ('cardId' in action) {
+    const hasCard = player.hand.some(c => c.id === action.cardId);
+    if (!hasCard) return ERRORS.CARD_NOT_IN_HAND;
+  } else if (action.type === 'DISCARD') {
+    const hasAllCards = action.cardIds.every(id => player.hand.some(c => c.id === id));
+    if (!hasAllCards) return ERRORS.CARD_NOT_IN_HAND;
+  }
+
+  switch (action.type) {
+    case 'PLAY_ORGAN': {
+      const card = player.hand.find(c => c.id === action.cardId)!;
+      // Check if player already has this color (wildcard is its own color or depends on implementation)        
+      // Usually, one of each color. Wildcard organ is a 5th unique type.
+      const alreadyHasColor = player.body.some(o => o.organCard.color === card.color);
+      if (alreadyHasColor) return ERRORS.ORGAN_ALREADY_EXISTS;
+      if (player.body.length >= 5) return ERRORS.BODY_FULL; // 4 colors + 1 wild
+      return null;
     }
+
+    case 'PLAY_VIRUS': {
+      const card = player.hand.find(c => c.id === action.cardId)!;
+      const targetPlayer = state.players.find(p => p.id === action.target.playerId);
+      if (!targetPlayer || targetPlayer.id === player.id) return ERRORS.INVALID_TARGET;
+      const targetOrgan = targetPlayer.body.find(o => o.id === action.target.organId);
+      if (!targetOrgan) return ERRORS.INVALID_TARGET;
+      if (targetOrgan.isImmune) return ERRORS.IMMUNE_TARGET;
+
+      // Color matching: wild card can infect anything, wild organ can be infected by anything
+      const colorMatch = card.color === 'wildcard' ||
+                         targetOrgan.organCard.color === 'wildcard' ||
+                         card.color === targetOrgan.organCard.color;
+      if (!colorMatch) return ERRORS.COLOR_MISMATCH;
+      return null;
+    }
+
+    case 'PLAY_MEDICINE': {
+      const card = player.hand.find(c => c.id === action.cardId)!;
+      const targetPlayer = state.players.find(p => p.id === action.target.playerId);
+      if (!targetPlayer || targetPlayer.id !== player.id) return ERRORS.INVALID_TARGET;
+      const targetOrgan = targetPlayer.body.find(o => o.id === action.target.organId);
+      if (!targetOrgan) return ERRORS.INVALID_TARGET;
+      if (targetOrgan.isImmune) return ERRORS.IMMUNE_TARGET;
+
+      const colorMatch = card.color === 'wildcard' ||
+                         targetOrgan.organCard.color === 'wildcard' ||
+                         card.color === targetOrgan.organCard.color;
+      if (!colorMatch) return ERRORS.COLOR_MISMATCH;
+      return null;
+    }
+
+    case 'PLAY_TREATMENT': {
+      const card = player.hand.find(c => c.id === action.cardId)!;
+      return validateTreatment(state, player, card, action.targets);
+    }
+
+    case 'DISCARD':
+      return null;
+
+    case 'PASS_TURN':
+      return null;
+
+    default:
+      return 'AcciÃ³n desconocida';
+  }
+};
+
+const validateTreatment = (state: GameState, player: Player, card: Card, targets: Target[]): string | null => { 
+  switch (card.name) {
+    case 'Transplante': {
+      if (targets.length !== 2) return ERRORS.INVALID_TARGET;
+      const [t1, t2] = targets;
+      const p1 = state.players.find(p => p.id === t1.playerId);
+      const p2 = state.players.find(p => p.id === t2.playerId);
+      if (!p1 || !p2) return ERRORS.INVALID_TARGET;
+      const o1 = p1.body.find(o => o.id === t1.organId);
+      const o2 = p2.body.find(o => o.id === t2.organId);
+      if (!o1 || !o2) return ERRORS.INVALID_TARGET;
+      if (o1.isImmune || o2.isImmune) return ERRORS.IMMUNE_TARGET;
+
+      // Rule: Can't have two organs of the same color after transplant
+      const p1HasColor = p1.body.some(o => o.id !== o1.id && o.organCard.color === o2.organCard.color);
+      const p2HasColor = p2.body.some(o => o.id !== o2.id && o.organCard.color === o1.organCard.color);
+      if (p1HasColor || p2HasColor) return ERRORS.ORGAN_ALREADY_EXISTS;
+
+      return null;
+    }
+    case 'LadrÃ³n de Ã³rganos': {
+      if (targets.length !== 1) return ERRORS.INVALID_TARGET;
+      const [t] = targets;
+      const victim = state.players.find(p => p.id === t.playerId);
+      if (!victim || victim.id === player.id) return ERRORS.INVALID_TARGET;
+      const organ = victim.body.find(o => o.id === t.organId);
+      if (!organ) return ERRORS.INVALID_TARGET;
+      if (organ.isImmune) return ERRORS.IMMUNE_TARGET;
+
+      const alreadyHasColor = player.body.some(o => o.organCard.color === organ.organCard.color);
+      if (alreadyHasColor) return ERRORS.ORGAN_ALREADY_EXISTS;
+      return null;
+    }
+    case 'Contagio': {
+      // Must have at least one virus to spread
+      const hasVirus = player.body.some(o => o.viruses.length > 0);
+      if (!hasVirus) return 'No tienes virus para contagiar';
+      return null;
+    }
+    case 'Guante de lÃ¡tex':
+      return null;
+    case 'Error mÃ©dico': {
+      if (targets.length !== 1) return ERRORS.INVALID_TARGET;
+      const targetPlayer = state.players.find(p => p.id === targets[0].playerId);
+      if (!targetPlayer || targetPlayer.id === player.id) return ERRORS.INVALID_TARGET;
+      return null;
+    }
+    default:
+      return 'Tratamiento no implementado';
+  }
+};
+
+/**
+ * REDUCER (THE ENGINE)
+ * Pure function.
+ */
+export const reduceGameState = (state: GameState, request: ActionRequest): GameState => {
+  const error = validateAction(state, request);
+  if (error) {
+    // In a real authoritative backend, we might throw or return an error state.
+    // For this engine, we'll return the state unchanged if invalid.
+    console.error(`AcciÃ³n invÃ¡lida: ${error}`);
+    return state;
+  }
+
+  let newState = { ...state };
+  const { playerId, action } = request;
+  const playerIndex = newState.players.findIndex(p => p.id === playerId);
+
+  // Clone players to ensure immutability
+  const players = newState.players.map(p => ({
+    ...p,
+    hand: [...p.hand],
+    body: p.body.map(o => ({ ...o, viruses: [...o.viruses], medicines: [...o.medicines] }))
+  }));
+  const currentPlayer = players[playerIndex];
+
+  // Execute action logic
+  switch (action.type) {
+    case 'PLAY_ORGAN':
+    case 'PLAY_VIRUS':
+    case 'PLAY_MEDICINE':
+    case 'PLAY_TREATMENT': {
+      const cardIndex = currentPlayer.hand.findIndex(c => c.id === action.cardId);
+      const [card] = currentPlayer.hand.splice(cardIndex, 1);
+
+      if (action.type === 'PLAY_ORGAN') {
+        currentPlayer.body = [...currentPlayer.body, {
+          id: `organ-${Date.now()}-${Math.random()}`,
+          organCard: card,
+          viruses: [],
+          medicines: [],
+          isImmune: false
+        }];
+      } else if (action.type === 'PLAY_VIRUS') {
+        const targetPlayer = players.find(p => p.id === action.target.playerId)!;
+        const targetOrgan = targetPlayer.body.find(o => o.id === action.target.organId)!;
+
+        if (targetOrgan.medicines.length > 0) {
+          const [neutralizedMed] = targetOrgan.medicines.splice(targetOrgan.medicines.length - 1, 1);
+          newState = {
+            ...newState,
+            discardPile: [...newState.discardPile, card, neutralizedMed]
+          };
+        } else {
+          targetOrgan.viruses = [...targetOrgan.viruses, card];
+          if (targetOrgan.viruses.length >= 2) {
+            targetPlayer.body = targetPlayer.body.filter(o => o.id !== targetOrgan.id);
+            newState = {
+              ...newState,
+              discardPile: [...newState.discardPile, targetOrgan.organCard, ...targetOrgan.viruses]
+            };
+          }
+        }
+      } else if (action.type === 'PLAY_MEDICINE') {
+        const targetOrgan = currentPlayer.body.find(o => o.id === action.target.organId)!;
+
+        if (targetOrgan.viruses.length > 0) {
+          const [neutralizedVirus] = targetOrgan.viruses.splice(targetOrgan.viruses.length - 1, 1);
+          newState = {
+            ...newState,
+            discardPile: [...newState.discardPile, card, neutralizedVirus]
+          };
+        } else {
+          targetOrgan.medicines = [...targetOrgan.medicines, card];
+          if (targetOrgan.medicines.length >= 2) {
+            (targetOrgan as any).isImmune = true;
+          }
+        }
+      } else if (action.type === 'PLAY_TREATMENT') {
+        newState = resolveTreatment(newState, players, currentPlayer, card, action.targets);
+        newState = { ...newState, discardPile: [...newState.discardPile, card] };
+      }
+      break;
+    }
+
+    case 'DISCARD': {
+      action.cardIds.forEach(id => {
+        const idx = currentPlayer.hand.findIndex(c => c.id === id);
+        if (idx !== -1) {
+          const [c] = currentPlayer.hand.splice(idx, 1);
+          newState = { ...newState, discardPile: [...newState.discardPile, c] };
+        }
+      });
+      break;
+    }
+
+    case 'PASS_TURN':
+      break;
+  }
+
+  // 2. Draw cards (refill to 3)
+  const finalPlayers = drawCards(players, newState.deck, newState.discardPile);
+
+  // 3. Update State
+  newState = {
+    ...newState,
+    players: finalPlayers.players,
+    deck: finalPlayers.deck,
+    discardPile: finalPlayers.discardPile,
+    currentPlayerIndex: (newState.currentPlayerIndex + 1) % newState.players.length,
+    turnCount: newState.turnCount + 1,
+    lastAction: action
   };
 
-  addCards('organ', 'red', 'Corazón', 5);
-  addCards('organ', 'green', 'Estómago', 5);
-  addCards('organ', 'blue', 'Cerebro', 5);
-  addCards('organ', 'yellow', 'Huesos', 5);
-  addCards('organ', 'multicolor', 'Órgano Comodín', 1);
+  // 4. Check Victory
+  const winner = newState.players.find(p => checkWin(p));
+  if (winner) {
+    newState = { ...newState, winnerId: winner.id, phase: 'GAME_OVER' };
+  }
 
-  addCards('virus', 'red', 'Virus Rojo', 4);
-  addCards('virus', 'green', 'Virus Verde', 4);
-  addCards('virus', 'blue', 'Virus Azul', 4);
-  addCards('virus', 'yellow', 'Virus Amarillo', 4);
-  addCards('virus', 'multicolor', 'Virus Comodín', 1);
+  return newState;
+};
 
-  addCards('medicine', 'red', 'Medicina Roja', 4);
-  addCards('medicine', 'green', 'Medicina Verde', 4);
-  addCards('medicine', 'blue', 'Medicina Azul', 4);
-  addCards('medicine', 'yellow', 'Medicina Amarilla', 4);
-  addCards('medicine', 'multicolor', 'Medicina Comodín', 4);
+const resolveTreatment = (state: GameState, players: any[], actor: any, card: Card, targets: Target[]): GameState => {
+  let newState = { ...state };
 
-  addCards('special', 'multicolor', 'Transplante', 2);
-  addCards('special', 'multicolor', 'Ladrón de órganos', 2);
-  addCards('special', 'multicolor', 'Contagio', 2);
-  addCards('special', 'multicolor', 'Error médico', 2);
-  addCards('special', 'multicolor', 'Guante de látex', 2);
-  addCards('special', 'multicolor', 'Vacuna', 2);
+  switch (card.name) {
+    case 'Transplante': {
+      const [t1, t2] = targets;
+      const p1 = players.find(p => p.id === t1.playerId);
+      const p2 = players.find(p => p.id === t2.playerId);
+      const o1Idx = p1.body.findIndex((o: any) => o.id === t1.organId);
+      const o2Idx = p2.body.findIndex((o: any) => o.id === t2.organId);
+      const o1 = p1.body[o1Idx];
+      const o2 = p2.body[o2Idx];
+      p1.body[o1Idx] = o2;
+      p2.body[o2Idx] = o1;
+      break;
+    }
+    case 'LadrÃ³n de Ã³rganos': {
+      const victim = players.find(p => p.id === targets[0].playerId);
+      const organIdx = victim.body.findIndex((o: any) => o.id === targets[0].organId);
+      const [stolen] = victim.body.splice(organIdx, 1);
+      actor.body.push(stolen);
+      break;
+    }
+    case 'Contagio': {
+      // Logic: Move all viruses from actor's organs to other players' valid organs
+      actor.body.forEach((o: any) => {
+        while (o.viruses.length > 0) {
+          const virus = o.viruses.pop();
+          let infected = false;
+          for (const p of players) {
+            if (p.id === actor.id) continue;
+            for (const targetOrgan of p.body) {
+              const canInfect = !targetOrgan.isImmune &&
+                                targetOrgan.viruses.length === 0 &&
+                                targetOrgan.medicines.length === 0 &&
+                                (virus.color === 'wildcard' || targetOrgan.organCard.color === 'wildcard' || virus.color === targetOrgan.organCard.color);
+              if (canInfect) {
+                targetOrgan.viruses.push(virus);
+                infected = true;
+                break;
+              }
+            }
+            if (infected) break;
+          }
+          if (!infected) newState = { ...newState, discardPile: [...newState.discardPile, virus] };
+        }
+      });
+      break;
+    }
+    case 'Guante de lÃ¡tex': {
+      players.forEach(p => {
+        if (p.id !== actor.id) {
+          newState = { ...newState, discardPile: [...newState.discardPile, ...p.hand] };
+          p.hand = [];
+        }
+      });
+      break;
+    }
+    case 'Error mÃ©dico': {
+      const targetPlayer = players.find(p => p.id === targets[0].playerId);
+      const tempBody = actor.body;
+      actor.body = targetPlayer.body;
+      targetPlayer.body = tempBody;
+      break;
+    }
+  }
+  return newState;
+};
 
-  const finalDeck = deck.map(c => {
-    if (c.name === 'Transplante') c.description = 'Intercambia un órgano por otro entre dos jugadores cualesquiera. No importa el color o si están infectados o vacunados. Prohibido trasplantar órganos inmunizados.';
-    if (c.name === 'Ladrón de órganos') c.description = 'Roba un órgano cualquiera al cuerpo de otro jugador y añádelo al tuyo.';
-    if (c.name === 'Contagio') c.description = 'Traslada todos los virus que puedas de tus órganos a los de otros jugadores. Sólo a órganos libres (sin virus ni medicinas).';
-    if (c.name === 'Guante de látex') c.description = 'Todos los demás jugadores descartan su mano completa.';
-    if (c.name === 'Error médico') c.description = 'Intercambia todo tu cuerpo (órganos, virus y medicinas) con el de otro jugador.';
-    return c;
+const drawCards = (players: any[], deck: readonly Card[], discard: readonly Card[]) => {
+  let currentDeck = [...deck];
+  let currentDiscard = [...discard];
+
+  const updatedPlayers = players.map(p => {
+    while (p.hand.length < 3) {
+      if (currentDeck.length === 0) {
+        if (currentDiscard.length === 0) break;
+        currentDeck = shuffle(currentDiscard);
+        currentDiscard = [];
+      }
+      p.hand.push(currentDeck.pop()!);
+    }
+    return p;
   });
 
-  return shuffle(finalDeck);
+  return { players: updatedPlayers, deck: currentDeck, discardPile: currentDiscard };
 };
 
 export const shuffle = <T>(array: T[]): T[] => {
@@ -58,380 +375,79 @@ export const shuffle = <T>(array: T[]): T[] => {
   return newArray;
 };
 
-export const initGame = (playerNames: string[]): GameState => {
-  const deck = createDeck();
-  const players: Player[] = playerNames.map((name, index) => ({
-    id: `p${index}`,
-    name,
+export const initGame = (players: { id: string, name: string }[]): GameState => {
+  const deck = createInitialDeck();
+  const shuffledDeck = shuffle(deck);
+
+  const gamePlayers: Player[] = players.map(p => ({
+    id: p.id,
+    name: p.name,
     hand: [],
-    organs: []
+    body: []
   }));
 
-  // Initial draw: 3 cards each
+  // Distribute 3 cards to each player
+  let currentDeck = [...shuffledDeck];
   for (let i = 0; i < 3; i++) {
-    players.forEach(p => {
-      const card = deck.pop();
-      if (card) p.hand.push(card);
-    });
+    for (const p of gamePlayers) {
+      const card = currentDeck.pop();
+      if (card) (p.hand as any[]).push(card);
+    }
   }
 
   return {
-    players,
+    players: gamePlayers,
     currentPlayerIndex: 0,
-    deck,
+    deck: currentDeck,
     discardPile: [],
-    winner: null,
-    logs: ['¡El juego ha comenzado!'],
-    needsDrawing: false
+    phase: 'PLAYING',
+    winnerId: null,
+    turnCount: 0
   };
 };
 
-/**
- * Authoritative validation for playing a card.
- * @param actingPlayerId The ID of the player attempting the action. Required for ownership and turn validation.
- */
-export const canPlayCard = (
-  gameState: GameState, 
-  card: Card, 
-  actingPlayerId?: string,
-  targetPlayerId?: string, 
-  targetOrganId?: string, 
-  targetPlayerId2?: string, 
-  targetOrganId2?: string
-): boolean => {
-  if (gameState.needsDrawing) return false;
-  
-  const currentPlayer = gameState.players[gameState.currentPlayerIndex];
-  
-  // 1. Turn Validation (if actingPlayerId provided)
-  if (actingPlayerId && currentPlayer.id !== actingPlayerId) return false;
-
-  // 2. Ownership Validation (if actingPlayerId provided)
-  if (actingPlayerId) {
-    const hasCard = currentPlayer.hand.some(c => c.id === card.id);
-    if (!hasCard) return false;
-  }
-  
-  // 3. Organ Placement
-  if (card.type === 'organ' || (card.type === 'special' && card.name === 'Órgano artificial')) {
-    const colorToMatch = card.name === 'Órgano artificial' ? 'multicolor' : card.color;
-    const hasColor = currentPlayer.organs.some(o => o.organCard.color === colorToMatch);
-    if (hasColor) return false;
-    if (currentPlayer.organs.length >= 4) return false;
-    return true;
-  }
-
-  // 4. Virus Attack
-  if (card.type === 'virus') {
-    if (targetPlayerId === undefined || targetOrganId === undefined) return false;
-    const targetPlayer = gameState.players.find(p => p.id === targetPlayerId);
-    if (!targetPlayer || targetPlayer.id === currentPlayer.id) return false; // Can't attack self
-    
-    const targetOrgan = targetPlayer.organs.find(o => o.id === targetOrganId);
-    if (!targetOrgan || targetOrgan.isImmune) return false;
-    
-    const colorMatch = card.color === 'multicolor' || targetOrgan.organCard.color === 'multicolor' || card.color === targetOrgan.organCard.color;
-    if (!colorMatch) return false;
-    if (targetOrgan.virus.length >= 2) return false;
-    
-    return true;
-  }
-
-  // 5. Medicine / Protection
-  if (card.type === 'medicine') {
-    if (targetPlayerId === undefined || targetOrganId === undefined) return false;
-    const targetPlayer = gameState.players.find(p => p.id === targetPlayerId);
-    if (!targetPlayer || targetPlayer.id !== currentPlayer.id) return false; // Can only heal self
-    
-    const targetOrgan = targetPlayer.organs.find(o => o.id === targetOrganId);
-    if (!targetOrgan || targetOrgan.isImmune) return false;
-    
-    const colorMatch = card.color === 'multicolor' || targetOrgan.organCard.color === 'multicolor' || card.color === targetOrgan.organCard.color;
-    if (!colorMatch) return false;
-
-    return true;
-  }
-
-  // 6. Special Cards
-  if (card.type === 'special') {
-    if (card.name === 'Guante de látex') return true;
-    
-    if (card.name === 'Contagio') {
-        // Must have at least one virus to spread
-        return currentPlayer.organs.some(o => o.virus.length > 0);
+const createInitialDeck = (): Card[] => {
+  const deck: Card[] = [];
+  const add = (count: number, type: any, color: any, name: string) => {
+    for (let i = 0; i < count; i++) {
+      deck.push({ id: `${type}-${color}-${i}-${Date.now()}-${Math.random()}`, type, color, name });
     }
-    
-    if (card.name === 'Error médico') {
-        if (targetPlayerId === undefined) return false;
-        if (targetPlayerId === currentPlayer.id) return false;
-        return true;
-    }
+  };
 
-    if (card.name === 'Transplante') {
-        if (targetPlayerId === undefined || targetOrganId === undefined || targetPlayerId2 === undefined || targetOrganId2 === undefined) return false;
-        const p1 = gameState.players.find(p => p.id === targetPlayerId);
-        const p2 = gameState.players.find(p => p.id === targetPlayerId2);
-        if (!p1 || !p2) return false;
-        const o1 = p1.organs.find(o => o.id === targetOrganId);
-        const o2 = p2.organs.find(o => o.id === targetOrganId2);
-        if (!o1 || !o2 || o1.isImmune || o2.isImmune) return false;
-        
-        // Check if swap would result in duplicate colors for either player
-        const p1OrgansAfter = p1.organs.filter(o => o.id !== targetOrganId).concat(o2);
-        const p2OrgansAfter = p2.organs.filter(o => o.id !== targetOrganId2).concat(o1);
-        
-        const hasDuplicate = (organs: OrganState[]) => {
-            const colors = organs.map(o => o.organCard.color);
-            return new Set(colors).size !== colors.length;
-        };
-        
-        if (hasDuplicate(p1OrgansAfter) || hasDuplicate(p2OrgansAfter)) return false;
+  // Organs
+  add(5, 'organ', 'red', 'CorazÃ³n');
+  add(5, 'organ', 'green', 'EstÃ³mago');
+  add(5, 'organ', 'blue', 'Cerebro');
+  add(5, 'organ', 'yellow', 'Hueso');
+  add(1, 'organ', 'wildcard', 'Ã“rgano Multicapa');
 
-        return true;
-    }
+  // Viruses
+  add(4, 'virus', 'red', 'Virus Rojo');
+  add(4, 'virus', 'green', 'Virus Verde');
+  add(4, 'virus', 'blue', 'Virus Azul');
+  add(4, 'virus', 'yellow', 'Virus Amarillo');
+  add(1, 'virus', 'wildcard', 'Virus Triple MutaciÃ³n');
 
-    if (card.name === 'Ladrón de órganos') {
-      if (targetPlayerId === undefined || targetOrganId === undefined) return false;
-      const targetPlayer = gameState.players.find(p => p.id === targetPlayerId);
-      if (!targetPlayer || targetPlayer.id === currentPlayer.id) return false;
-      const targetOrgan = targetPlayer.organs.find(o => o.id === targetOrganId);
-      if (!targetOrgan || targetOrgan.isImmune) return false;
-      if (currentPlayer.organs.some(o => o.organCard.color === targetOrgan.organCard.color)) return false;
-      return true;
-    }
+  // Medicines
+  add(4, 'medicine', 'red', 'Medicina Roja');
+  add(4, 'medicine', 'green', 'Medicina Verde');
+  add(4, 'medicine', 'blue', 'Medicina Azul');
+  add(4, 'medicine', 'yellow', 'Medicina Amarilla');
+  add(4, 'medicine', 'wildcard', 'Medicina Universal');
 
-    if (card.name === 'Vacuna') {
-      if (targetPlayerId === undefined || targetOrganId === undefined) return false;
-      const targetPlayer = gameState.players.find(p => p.id === targetPlayerId);
-      if (!targetPlayer || targetPlayer.id !== currentPlayer.id) return false;
-      const targetOrgan = targetPlayer.organs.find(o => o.id === targetOrganId);
-      if (!targetOrgan || targetOrgan.isImmune) return false;
-      return true;
-    }
+  // Treatments
+  add(2, 'treatment', 'wildcard', 'Transplante');
+  add(2, 'treatment', 'wildcard', 'LadrÃ³n de Ã³rganos');
+  add(2, 'treatment', 'wildcard', 'Contagio');
+  add(2, 'treatment', 'wildcard', 'Guante de lÃ¡tex');
+  add(2, 'treatment', 'wildcard', 'Error mÃ©dico');
 
-    return true; 
-  }
-
-  return false;
-};
-
-export const drawCard = (state: GameState): GameState => {
-  const newState = JSON.parse(JSON.stringify(state)) as GameState;
-  const currentPlayer = newState.players[newState.currentPlayerIndex];
-
-  while (currentPlayer.hand.length < 3) {
-    if (newState.deck.length === 0) {
-      if (newState.discardPile.length === 0) break;
-      newState.deck = shuffle(newState.discardPile);
-      newState.discardPile = [];
-      newState.logs.unshift('El mazo se ha agotado. Barajando...');
-    }
-    currentPlayer.hand.push(newState.deck.pop()!);
-  }
-
-  newState.needsDrawing = false;
-  newState.currentPlayerIndex = (newState.currentPlayerIndex + 1) % newState.players.length;
-
-  // AUTO-RECOVERY: If next player has less than 3 cards, draw automatically
-  const nextPlayer = newState.players[newState.currentPlayerIndex];
-  if (nextPlayer.hand.length < 3) {
-    newState.logs.unshift(`${nextPlayer.name} roba cartas automáticamente para recuperar su mano.`);
-    while (nextPlayer.hand.length < 3) {
-      if (newState.deck.length === 0) {
-        if (newState.discardPile.length === 0) break;
-        newState.deck = shuffle(newState.discardPile);
-        newState.discardPile = [];
-      }
-      nextPlayer.hand.push(newState.deck.pop()!);
-    }
-  }
-
-  return newState;
-};
-
-// Cross-platform compatible random ID generator
-const generateId = (prefix: string) => {
-    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
-        return `${prefix}-${crypto.randomUUID()}`;
-    }
-    return `${prefix}-${Math.random().toString(36).substr(2, 9)}`;
-};
-
-export const playCard = (state: GameState, cardId: string, targetPlayerId?: string, targetOrganId?: string, targetPlayerId2?: string, targetOrganId2?: string): GameState => {
-  const newState = JSON.parse(JSON.stringify(state)) as GameState;
-  const currentPlayer = newState.players[newState.currentPlayerIndex];
-  const cardIndex = currentPlayer.hand.findIndex(c => c.id === cardId);
-  const card = currentPlayer.hand[cardIndex];
-
-  if (!card) return state;
-
-  currentPlayer.hand.splice(cardIndex, 1);
-  let staysOnBoard = false;
-
-  if (card.type === 'organ' || (card.type === 'special' && card.name === 'Órgano artificial')) {
-    newState.players[newState.currentPlayerIndex].organs.push({
-      id: generateId('organ'),
-      organCard: card,
-      virus: [],
-      medicines: [],
-      isImmune: false
-    });
-    newState.logs.unshift(`${currentPlayer.name} bajó un ${card.name}`);
-    staysOnBoard = true;
-  } else if (card.type === 'virus') {
-    const targetPlayer = newState.players.find(p => p.id === targetPlayerId);
-    if (targetPlayer && targetOrganId !== undefined) {
-      const organIndex = targetPlayer.organs.findIndex(o => o.id === targetOrganId);
-      const organ = targetPlayer.organs[organIndex];
-      if (organ && organ.medicines.length > 0) {
-        const cured = organ.medicines.pop();
-        if (cured) newState.discardPile.push(cured);
-        newState.discardPile.push(card);
-        newState.logs.unshift(`${currentPlayer.name} infectó medicina de ${targetPlayer.name}`);
-      } else if (organ) {
-        organ.virus.push(card);
-        newState.logs.unshift(`${currentPlayer.name} infectó a ${targetPlayer.name}`);
-        if (organ.virus.length >= 2) {
-          newState.discardPile.push(organ.organCard);
-          organ.virus.forEach(v => newState.discardPile.push(v));
-          targetPlayer.organs.splice(organIndex, 1);
-          newState.logs.unshift(`¡Órgano de ${targetPlayer.name} destruido!`);
-        } else {
-            staysOnBoard = true;
-        }
-      }
-    }
-  } else if (card.type === 'medicine') {
-    const targetPlayer = newState.players.find(p => p.id === targetPlayerId); 
-    if (targetPlayer && targetOrganId !== undefined) {
-      const organ = targetPlayer.organs.find(o => o.id === targetOrganId);
-      if (organ && organ.virus.length > 0) {
-        const cured = organ.virus.pop();
-        if (cured) newState.discardPile.push(cured);
-        newState.discardPile.push(card);
-        newState.logs.unshift(`${currentPlayer.name} curó virus`);
-      } else if (organ) {
-        organ.medicines.push(card);
-        newState.logs.unshift(`${currentPlayer.name} puso medicina`);
-        if (organ.medicines.length >= 2) {
-          organ.isImmune = true;
-          newState.logs.unshift(`¡Órgano INMUNE!`);
-        } else {
-            staysOnBoard = true;
-        }
-      }
-    }
-  } else if (card.type === 'special') {
-    if (card.name === 'Guante de látex') {
-      newState.players.forEach(p => {
-        if (p.id !== currentPlayer.id) {
-          p.hand.forEach(c => newState.discardPile.push(c));
-          p.hand = [];
-        }
-      });
-      newState.logs.unshift(`¡Guante de látex! Todos descartan su mano`);
-    } else if (card.name === 'Error médico') {
-      const targetPlayer = newState.players.find(p => p.id === targetPlayerId);
-      if (targetPlayer) {
-          const temp = currentPlayer.organs;
-          currentPlayer.organs = targetPlayer.organs;
-          targetPlayer.organs = temp;
-          newState.logs.unshift(`¡Error Médico! ${currentPlayer.name} cambió cuerpo con ${targetPlayer.name}`);
-      }
-    } else if (card.name === 'Transplante') {
-        const p1 = newState.players.find(p => p.id === targetPlayerId);
-        const p2 = newState.players.find(p => p.id === targetPlayerId2);
-        if (p1 && p2 && targetOrganId && targetOrganId2) {
-            const idx1 = p1.organs.findIndex(o => o.id === targetOrganId);
-            const idx2 = p2.organs.findIndex(o => o.id === targetOrganId2);
-            const o1 = p1.organs[idx1];
-            const o2 = p2.organs[idx2];
-            p1.organs[idx1] = o2;
-            p2.organs[idx2] = o1;
-            newState.logs.unshift(`¡Transplante! ${p1.name} y ${p2.name} intercambiaron órganos`);
-        }
-    } else if (card.name === 'Ladrón de órganos') {
-        const victim = newState.players.find(p => p.id === targetPlayerId);
-        if (victim && targetOrganId !== undefined) {
-            const organIndex = victim.organs.findIndex(o => o.id === targetOrganId);
-            const stolen = victim.organs.splice(organIndex, 1)[0];
-            currentPlayer.organs.push(stolen);
-            newState.logs.unshift(`${currentPlayer.name} robó órgano a ${victim.name}`);
-        }
-    } else if (card.name === 'Contagio') {
-        const myViruses: Card[] = [];
-        currentPlayer.organs.forEach(o => {
-            while(o.virus.length > 0) myViruses.push(o.virus.pop()!);
-        });
-        
-        myViruses.forEach(v => {
-            let placed = false;
-            for (let p of newState.players) {
-                if (p.id === currentPlayer.id) continue;
-                for (let o of p.organs) {
-                    if (!o.isImmune && (v.color === 'multicolor' || o.organCard.color === 'multicolor' || v.color === o.organCard.color) && o.virus.length === 0 && o.medicines.length === 0) {
-                        o.virus.push(v);
-                        placed = true;
-                        break;
-                    }
-                }
-                if (placed) break;
-            }
-            if (!placed) newState.discardPile.push(v);
-        });
-        newState.logs.unshift(`¡Contagio! ${currentPlayer.name} repartió sus virus`);
-    } else if (card.name === 'Vacuna') {
-        if (targetOrganId !== undefined) {
-            const organ = currentPlayer.organs.find(o => o.id === targetOrganId);
-            if (organ) {
-                organ.virus.forEach(v => newState.discardPile.push(v));
-                organ.virus = [];
-                organ.isImmune = true;
-                newState.logs.unshift(`${currentPlayer.name} usó Vacuna: Órgano curado e inmune`);
-            }
-        }
-    }
-    newState.discardPile.push(card);
-  }
-
-  if (!staysOnBoard && card.type !== 'special') {
-      if (!newState.discardPile.some(c => c.id === card.id)) {
-          newState.discardPile.push(card);
-      }
-  }
-
-  if (checkWin(currentPlayer)) {
-    newState.winner = currentPlayer;
-    newState.logs.unshift(`¡${currentPlayer.name} HA GANADO!`);
-  }
-
-  return endTurn(newState);
+  return deck;
 };
 
 export const checkWin = (player: Player): boolean => {
-  const healthyOrgans = player.organs.filter(o => o.virus.length === 0);
-  const uniqueColors = new Set(healthyOrgans.map(o => o.organCard.color === 'multicolor' ? 'multicolor' : o.organCard.color));
-  return uniqueColors.size >= 4;
-};
-
-export const endTurn = (state: GameState): GameState => {
-  const newState = JSON.parse(JSON.stringify(state)) as GameState;
-  newState.needsDrawing = true;
-  return newState;
-};
-
-export const discardCards = (state: GameState, cardIds: string[]): GameState => {
-  const newState = JSON.parse(JSON.stringify(state)) as GameState;
-  const currentPlayer = newState.players[newState.currentPlayerIndex];
-
-  cardIds.forEach(id => {
-    const index = currentPlayer.hand.findIndex(c => id === c.id);
-    if (index !== -1) {
-      const card = currentPlayer.hand.splice(index, 1)[0];
-      newState.discardPile.push(card);
-    }
-  });
-
-  newState.logs.unshift(`${currentPlayer.name} descartó ${cardIds.length} carta(s)`);
-  return endTurn(newState);
+  const healthyOrgans = player.body.filter(o => o.viruses.length === 0);
+  // Need 4 healthy distinct organs. Wildcard counts as a distinct type.
+  const colors = new Set(healthyOrgans.map(o => o.organCard.color));
+  return colors.size >= 4;
 };
