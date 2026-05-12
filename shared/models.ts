@@ -131,4 +131,5 @@ export interface CardImageMap {
   sp_infection: string;
   sp_error: string;
   sp_glove: string;
+  default?: string;
 }

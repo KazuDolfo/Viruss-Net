@@ -23,7 +23,8 @@ export const colorMap: Record<string, string> = {
   red: 'from-red-500 to-red-700 border-red-800',
   blue: 'from-blue-500 to-blue-700 border-blue-800',
   green: 'from-green-500 to-green-700 border-green-800',
-  yellow: 'from-yellow-400 to-yellow-600 border-yellow-700'
+  yellow: 'from-yellow-400 to-yellow-600 border-yellow-700',
+  wildcard: 'from-purple-500 via-pink-500 to-orange-500 border-purple-800'
 };
 
 const organTheme: Record<string, { icon: any; color: string; label: string }> = {
@@ -72,8 +73,8 @@ const CardUIBase: React.FC<CardUIProps> = ({ card, onClick, selected, disabled, 
     if (normalizedName.includes('heart') || normalizedName.includes('corazon')) return 'heart';
     if (normalizedName.includes('brain') || normalizedName.includes('cerebro')) return 'brain';
     if (normalizedName.includes('stomach') || normalizedName.includes('estomago')) return 'stomach';
-    if (normalizedName.includes('bones') || normalizedName.includes('huesos')) return 'bone';
-    if (normalizedName.includes('comodin') && card.type === 'organ') return 'wildcard';
+    if (normalizedName.includes('bone') || normalizedName.includes('hueso')) return 'bone';
+    if ((normalizedName.includes('comodin') || normalizedName.includes('multicapa')) && card.type === 'organ') return 'wildcard';
     
     // 3. Virus
     if (card.type === 'virus') {
@@ -81,7 +82,7 @@ const CardUIBase: React.FC<CardUIProps> = ({ card, onClick, selected, disabled, 
        if (normalizedName.includes('verde')) return 'virus_green';
        if (normalizedName.includes('azul')) return 'virus_blue';
        if (normalizedName.includes('amarillo')) return 'virus_yellow';
-       if (normalizedName.includes('comodin')) return 'virus_wildcard';
+       if (normalizedName.includes('comodin') || normalizedName.includes('triple')) return 'virus_wildcard';
     }
 
     // 4. Medicine
@@ -90,7 +91,7 @@ const CardUIBase: React.FC<CardUIProps> = ({ card, onClick, selected, disabled, 
        if (normalizedName.includes('verde')) return 'med_green';
        if (normalizedName.includes('azul')) return 'med_blue';
        if (normalizedName.includes('amarilla')) return 'med_yellow';
-       if (normalizedName.includes('comodin')) return 'med_wildcard';
+       if (normalizedName.includes('comodin') || normalizedName.includes('universal')) return 'med_wildcard';
     }
 
     // Special catch-all for names if type check failed
@@ -100,7 +101,7 @@ const CardUIBase: React.FC<CardUIProps> = ({ card, onClick, selected, disabled, 
     if (normalizedName.includes('error')) return 'sp_error';
     if (normalizedName.includes('guante')) return 'sp_glove';
 
-    return 'heart';
+    return 'default' as any;
   }, [normalizedName, card.type]);
 
   const customUrl = images[organKey];

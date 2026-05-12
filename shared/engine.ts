@@ -14,13 +14,13 @@ import {
  */
 export const ERRORS = {
   NOT_YOUR_TURN: 'No es tu turno',
-  INVALID_PHASE: 'Fase de juego invÃ¡lida para esta acciÃ³n',
-  CARD_NOT_IN_HAND: 'La carta no estÃ¡ en tu mano',
-  INVALID_TARGET: 'Objetivo invÃ¡lido',
-  ORGAN_ALREADY_EXISTS: 'Ya tienes un Ã³rgano de este color',
-  BODY_FULL: 'Cuerpo completo (mÃ¡ximo 4 Ã³rganos distintos)',
-  IMMUNE_TARGET: 'El objetivo estÃ¡ inmunizado',
-  COLOR_MISMATCH: 'El color de la carta no coincide con el Ã³rgano',
+  INVALID_PHASE: 'Fase de juego inválida para esta acción',
+  CARD_NOT_IN_HAND: 'La carta no está en tu mano',
+  INVALID_TARGET: 'Objetivo inválido',
+  ORGAN_ALREADY_EXISTS: 'Ya tienes un órgano de este color',
+  BODY_FULL: 'Cuerpo completo (máximo 4 órganos distintos)',
+  IMMUNE_TARGET: 'El objetivo está inmunizado',
+  COLOR_MISMATCH: 'El color de la carta no coincide con el órgano',
   NOT_ENOUGH_CARDS: 'No tienes suficientes cartas para descartar',
   GAME_OVER: 'El juego ya ha terminado',
 };
@@ -155,7 +155,7 @@ const validateTreatment = (state: GameState, player: Player, card: Card, targets
 
       return null;
     }
-    case 'LadrÃ³n de Ã³rganos': {
+    case 'Ladrón de órganos': {
       if (targets.length !== 1) return ERRORS.INVALID_TARGET;
       const [t] = targets;
       const victim = state.players.find(p => p.id === t.playerId);
@@ -174,9 +174,9 @@ const validateTreatment = (state: GameState, player: Player, card: Card, targets
       if (!hasVirus) return 'No tienes virus para contagiar';
       return null;
     }
-    case 'Guante de lÃ¡tex':
+    case 'Guante de látex':
       return null;
-    case 'Error mÃ©dico': {
+    case 'Error médico': {
       if (targets.length !== 1) return ERRORS.INVALID_TARGET;
       const targetPlayer = state.players.find(p => p.id === targets[0].playerId);
       if (!targetPlayer || targetPlayer.id === player.id) return ERRORS.INVALID_TARGET;
@@ -194,7 +194,7 @@ const validateTreatment = (state: GameState, player: Player, card: Card, targets
 export const reduceGameState = (state: GameState, request: ActionRequest): GameState => {
   const error = validateAction(state, request);
   if (error) {
-    console.error(`AcciÃ³n invÃ¡lida: ${error}`);
+    console.error(`Acción inválida: ${error}`);
     return state;
   }
 
@@ -342,7 +342,7 @@ const resolveTreatment = (state: GameState, players: any[], actor: any, card: Ca
       p2.body[o2Idx] = o1;
       break;
     }
-    case 'LadrÃ³n de Ã³rganos': {
+    case 'Ladrón de órganos': {
       const victim = players.find(p => p.id === targets[0].playerId);
       const organIdx = victim.body.findIndex((o: any) => o.id === targets[0].organId);
       const [stolen] = victim.body.splice(organIdx, 1);
@@ -375,7 +375,7 @@ const resolveTreatment = (state: GameState, players: any[], actor: any, card: Ca
       });
       break;
     }
-    case 'Guante de lÃ¡tex': {
+    case 'Guante de látex': {
       players.forEach(p => {
         if (p.id !== actor.id) {
           newState = { ...newState, discardPile: [...newState.discardPile, ...p.hand] };
@@ -384,7 +384,7 @@ const resolveTreatment = (state: GameState, players: any[], actor: any, card: Ca
       });
       break;
     }
-    case 'Error mÃ©dico': {
+    case 'Error médico': {
       const targetPlayer = players.find(p => p.id === targets[0].playerId);
       const tempBody = actor.body;
       actor.body = targetPlayer.body;
@@ -463,18 +463,18 @@ const createInitialDeck = (): Card[] => {
   };
 
   // Organs
-  add(5, 'organ', 'red', 'CorazÃ³n');
-  add(5, 'organ', 'green', 'EstÃ³mago');
+  add(5, 'organ', 'red', 'Corazón');
+  add(5, 'organ', 'green', 'Estómago');
   add(5, 'organ', 'blue', 'Cerebro');
   add(5, 'organ', 'yellow', 'Hueso');
-  add(1, 'organ', 'wildcard', 'Ã“rgano Multicapa');
+  add(1, 'organ', 'wildcard', 'Órgano Multicapa');
 
   // Viruses
   add(4, 'virus', 'red', 'Virus Rojo');
   add(4, 'virus', 'green', 'Virus Verde');
   add(4, 'virus', 'blue', 'Virus Azul');
   add(4, 'virus', 'yellow', 'Virus Amarillo');
-  add(1, 'virus', 'wildcard', 'Virus Triple MutaciÃ³n');
+  add(1, 'virus', 'wildcard', 'Virus Triple Mutación');
 
   // Medicines
   add(4, 'medicine', 'red', 'Medicina Roja');
@@ -485,10 +485,10 @@ const createInitialDeck = (): Card[] => {
 
   // Treatments
   add(2, 'treatment', 'wildcard', 'Transplante');
-  add(2, 'treatment', 'wildcard', 'LadrÃ³n de Ã³rganos');
+  add(2, 'treatment', 'wildcard', 'Ladrón de órganos');
   add(2, 'treatment', 'wildcard', 'Contagio');
-  add(2, 'treatment', 'wildcard', 'Guante de lÃ¡tex');
-  add(2, 'treatment', 'wildcard', 'Error mÃ©dico');
+  add(2, 'treatment', 'wildcard', 'Guante de látex');
+  add(2, 'treatment', 'wildcard', 'Error médico');
 
   return deck;
 };

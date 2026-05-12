@@ -39,7 +39,8 @@ const DEFAULT_IMAGES: CardImageMap = {
   "sp_thief": "https://res.cloudinary.com/diva0hfgm/image/upload/f_auto,q_auto,w_300/v1778137322/ladron-tratamiento_a2xpvy.png",
   "sp_infection": "https://res.cloudinary.com/diva0hfgm/image/upload/f_auto,q_auto,w_300/v1778137367/contagio-tratamiento_jwwnxb.png",
   "sp_error": "https://res.cloudinary.com/diva0hfgm/image/upload/f_auto,q_auto,w_300/v1778137321/errorMedico-tratamiento_x4t9zi.png",
-  "sp_glove": "https://res.cloudinary.com/diva0hfgm/image/upload/f_auto,q_auto,w_300/v1778137322/guantes-latez-tratamiento_rupzef.png"
+  "sp_glove": "https://res.cloudinary.com/diva0hfgm/image/upload/f_auto,q_auto,w_300/v1778137322/guantes-latez-tratamiento_rupzef.png",
+  "default": "https://res.cloudinary.com/diva0hfgm/image/upload/f_auto,q_auto,w_300/v1778137322/Heart-organ_qtir3b.png"
 };
 
 export const useImageManager = create<ImageState>((set, get) => {
