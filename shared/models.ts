@@ -11,6 +11,7 @@ export interface Card {
   readonly type: CardType;
   readonly color: CardColor;
   readonly name: string;
+  readonly description?: string;
 }
 
 export interface OrganState {

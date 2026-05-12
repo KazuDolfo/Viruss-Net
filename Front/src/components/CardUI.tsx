@@ -159,20 +159,32 @@ const CardUIBase: React.FC<CardUIProps> = ({ card, onClick, selected, disabled, 
         />
       )}
 
-      {/* OVERLAY LABEL */}
+      {/* OVERLAY LABEL & DESCRIPTION */}
       {showImage && (
-        <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/90 via-black/40 to-transparent z-20 flex items-end justify-center pb-1.5 md:pb-2 px-1">
-          <span className="text-white font-black text-[8px] xs:text-[9px] md:text-xs tracking-tighter uppercase text-center leading-none truncate w-full drop-shadow-md">
+        <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/95 via-black/70 to-transparent z-20 flex flex-col items-center justify-end pb-3 md:pb-5 px-2 transition-all group-hover:h-2/3">
+          <span className="text-white font-black text-[10px] xs:text-[11px] md:text-sm tracking-tighter uppercase text-center leading-none mb-1 drop-shadow-md">
             {card.name}
           </span>
+          {card.description && (
+             <p className="text-[7px] md:text-[9px] text-white/80 font-medium text-center leading-tight line-clamp-2 md:line-clamp-3 italic">
+               {card.description}
+             </p>
+          )}
         </div>
       )}
 
       {/* BASE DESIGN / FALLBACK */}
       {showFallback && (
         <>
-          <div className="text-white font-black text-center leading-tight drop-shadow-lg z-20 w-full px-1 text-[10px] xs:text-xs md:text-sm">
-            {card.name}
+          <div className="flex flex-col items-center gap-1 z-20 w-full px-1">
+            <div className="text-white font-black text-center leading-tight drop-shadow-lg text-[10px] xs:text-xs md:text-sm">
+              {card.name}
+            </div>
+            {!small && card.description && (
+              <p className="text-[7px] md:text-[9px] text-white/70 font-medium text-center leading-tight line-clamp-2 italic px-2">
+                {card.description}
+              </p>
+            )}
           </div>
           
           <div className="flex flex-1 items-center justify-center py-1 z-20 relative w-full">

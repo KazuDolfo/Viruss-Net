@@ -456,39 +456,45 @@ export const initGame = (players: { id: string, name: string }[]): GameState => 
 
 const createInitialDeck = (): Card[] => {
   const deck: Card[] = [];
-  const add = (count: number, type: any, color: any, name: string) => {
+  const add = (count: number, type: any, color: any, name: string, description?: string) => {
     for (let i = 0; i < count; i++) {
-      deck.push({ id: `${type}-${color}-${i}-${Date.now()}-${Math.random()}`, type, color, name });
+      deck.push({ 
+        id: `${type}-${color}-${i}-${Date.now()}-${Math.random()}`, 
+        type, 
+        color, 
+        name,
+        description
+      });
     }
   };
 
   // Organs
-  add(5, 'organ', 'red', 'Corazón');
-  add(5, 'organ', 'green', 'Estómago');
-  add(5, 'organ', 'blue', 'Cerebro');
-  add(5, 'organ', 'yellow', 'Hueso');
-  add(1, 'organ', 'wildcard', 'Órgano Multicapa');
+  add(5, 'organ', 'red', 'Corazón', 'Órgano vital. Protégelo para ganar.');
+  add(5, 'organ', 'green', 'Estómago', 'Órgano vital. Protégelo para ganar.');
+  add(5, 'organ', 'blue', 'Cerebro', 'Órgano vital. Protégelo para ganar.');
+  add(5, 'organ', 'yellow', 'Hueso', 'Órgano vital. Protégelo para ganar.');
+  add(1, 'organ', 'wildcard', 'Órgano Multicapa', 'Cuenta como cualquier color, pero es más vulnerable.');
 
   // Viruses
-  add(4, 'virus', 'red', 'Virus Rojo');
-  add(4, 'virus', 'green', 'Virus Verde');
-  add(4, 'virus', 'blue', 'Virus Azul');
-  add(4, 'virus', 'yellow', 'Virus Amarillo');
-  add(1, 'virus', 'wildcard', 'Virus Triple Mutación');
+  add(4, 'virus', 'red', 'Virus Rojo', 'Infecta un órgano rojo o comodín. Dos virus lo destruyen.');
+  add(4, 'virus', 'green', 'Virus Verde', 'Infecta un órgano verde o comodín. Dos virus lo destruyen.');
+  add(4, 'virus', 'blue', 'Virus Azul', 'Infecta un órgano azul o comodín. Dos virus lo destruyen.');
+  add(4, 'virus', 'yellow', 'Virus Amarillo', 'Infecta un órgano amarillo o comodín. Dos virus lo destruyen.');
+  add(1, 'virus', 'wildcard', 'Virus Triple Mutación', 'Infecta cualquier órgano. Muy contagioso.');
 
   // Medicines
-  add(4, 'medicine', 'red', 'Medicina Roja');
-  add(4, 'medicine', 'green', 'Medicina Verde');
-  add(4, 'medicine', 'blue', 'Medicina Azul');
-  add(4, 'medicine', 'yellow', 'Medicina Amarilla');
-  add(4, 'medicine', 'wildcard', 'Medicina Universal');
+  add(4, 'medicine', 'red', 'Medicina Roja', 'Cura un virus rojo o protege un órgano rojo.');
+  add(4, 'medicine', 'green', 'Medicina Verde', 'Cura un virus verde o protege un órgano verde.');
+  add(4, 'medicine', 'blue', 'Medicina Azul', 'Cura un virus azul o protege un órgano azul.');
+  add(4, 'medicine', 'yellow', 'Medicina Amarilla', 'Cura un virus amarillo o protege un órgano amarillo.');
+  add(4, 'medicine', 'wildcard', 'Medicina Universal', 'Cura cualquier virus o protege cualquier órgano.');
 
   // Treatments
-  add(2, 'treatment', 'wildcard', 'Transplante');
-  add(2, 'treatment', 'wildcard', 'Ladrón de órganos');
-  add(2, 'treatment', 'wildcard', 'Contagio');
-  add(2, 'treatment', 'wildcard', 'Guante de látex');
-  add(2, 'treatment', 'wildcard', 'Error médico');
+  add(2, 'treatment', 'wildcard', 'Transplante', 'Intercambia un órgano entre dos jugadores.');
+  add(2, 'treatment', 'wildcard', 'Ladrón de órganos', 'Roba un órgano a otro jugador y ponlo en tu cuerpo.');
+  add(2, 'treatment', 'wildcard', 'Contagio', 'Pasa tus virus a los órganos de otros jugadores.');
+  add(2, 'treatment', 'wildcard', 'Guante de látex', 'Todos los demás jugadores descartan su mano.');
+  add(2, 'treatment', 'wildcard', 'Error médico', 'Intercambia todo tu cuerpo con el de otro jugador.');
 
   return deck;
 };
