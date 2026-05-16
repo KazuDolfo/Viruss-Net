@@ -69,25 +69,25 @@ const PlayerBoardBase: React.FC<PlayerBoardProps> = ({
 
       {/* Organs Area - Uses CSS Grid for perfect alignment */}
       <div className={cn(
-        "grid gap-2 md:gap-4 items-center justify-items-center border-2 border-dashed border-white/5 rounded-xl md:rounded-2xl bg-black/20 p-2 md:p-4 h-full",
+        "grid gap-3 md:gap-6 items-center justify-items-center border-2 border-dashed border-white/5 rounded-xl md:rounded-[2.5rem] bg-black/20 p-2 md:p-8 h-full",
         // Always 4 columns to save vertical space and maintain consistent layout
         "grid-cols-4"
       )}>
         {slots.map((idx) => {
           const organ = player.body[idx];
           return (
-            <div key={idx} className="w-full flex justify-center aspect-[2/3] max-w-[80px] xs:max-w-[100px] md:max-w-none">
+            <div key={idx} className="w-full flex justify-center aspect-[2/3] max-w-[100px] xs:max-w-[120px] md:max-w-none">
               {organ ? (
                 <OrganSlot 
                   organ={organ} 
                   onClick={() => onOrganClick(player.id, organ.id)}
                   canTarget={canTargetOrgan(player.id, organ.id)}
                   isSelected={pendingTargets.some(t => t.playerId === player.id && t.organId === organ.id)}
-                  small={compact || player.body.length > 4}
+                  small={compact}
                 />
               ) : (
-                <div className="w-full h-full border-2 border-dashed border-white/10 rounded-lg md:rounded-xl flex items-center justify-center opacity-20">
-                  <div className="w-6 h-6 md:w-12 md:h-12 border-2 border-white/20 rounded-full" />
+                <div className="w-full h-full border-2 border-dashed border-white/10 rounded-lg md:rounded-[2rem] flex items-center justify-center opacity-20">
+                  <div className="w-8 h-8 md:w-20 md:h-20 border-2 border-white/20 rounded-full" />
                 </div>
               )}
             </div>

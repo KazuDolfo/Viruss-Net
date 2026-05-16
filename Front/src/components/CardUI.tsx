@@ -130,16 +130,17 @@ const CardUIBase: React.FC<CardUIProps> = ({ card, onClick, selected, disabled, 
     <div
       onClick={!disabled ? onClick : undefined}
       className={cn(
-        'relative flex flex-col items-center justify-between rounded-[0.75rem] md:rounded-[1rem] border-[2px] md:border-[3px] p-1.5 md:p-2 transition-all cursor-pointer shadow-xl select-none touch-manipulation overflow-hidden group bg-gradient-to-b will-change-transform aspect-[2/3] w-full',
+        'relative flex flex-col items-center justify-between rounded-[0.75rem] md:rounded-[1.25rem] border-[2px] md:border-[4px] p-1.5 md:p-2.5 transition-all cursor-pointer shadow-xl select-none touch-manipulation overflow-hidden group bg-gradient-to-b will-change-transform aspect-[2/3] w-full',
         colorMap[card.color],
-        small ? 'max-w-[70px] md:max-w-[90px]' : 'max-w-[120px] xs:max-w-[140px] md:max-w-[180px]',
-        selected ? 'ring-4 ring-white -translate-y-4 scale-105 z-20 shadow-[0_0_30px_rgba(255,255,255,0.4)]' : 'hover:-translate-y-2 hover:scale-[1.02]',
+        // Responsive scaling: Tiny on mobile body, Medium on mobile hand, Large on Tablet, Huge on PC
+        small ? 'max-w-[75px] xs:max-w-[85px] md:max-w-[110px] lg:max-w-[130px]' : 'max-w-[130px] xs:max-w-[150px] md:max-w-[200px] lg:max-w-[240px]',
+        selected ? 'ring-4 ring-white -translate-y-4 scale-105 z-20 shadow-[0_0_40px_rgba(255,255,255,0.5)]' : 'hover:-translate-y-2 hover:scale-[1.02]',
         disabled && 'opacity-40 grayscale cursor-not-allowed',
         className
       )}
     >
       {/* GLOSSY EFFECT */}
-      <div className="absolute inset-0 bg-gradient-to-tr from-white/20 via-transparent to-transparent opacity-30 md:opacity-40 pointer-events-none z-30" />
+      <div className="absolute inset-0 bg-gradient-to-tr from-white/25 via-transparent to-transparent opacity-30 md:opacity-50 pointer-events-none z-30" />
       
       {/* SKELETON / LOADING */}
       {isLoading && <CardSkeleton />}
@@ -151,7 +152,7 @@ const CardUIBase: React.FC<CardUIProps> = ({ card, onClick, selected, disabled, 
           alt={card.name}
           loading="lazy"
           className={cn(
-            "absolute inset-0 w-full h-full object-cover z-10 transition-all duration-500 ease-out will-change-opacity",
+            "absolute inset-0 w-full h-full object-cover z-10 transition-all duration-700 ease-out will-change-opacity",
             imageStatus === 'loaded' ? "opacity-100 scale-100" : "opacity-0 scale-110"
           )}
           onLoad={() => setImageStatus('loaded')}
@@ -163,16 +164,16 @@ const CardUIBase: React.FC<CardUIProps> = ({ card, onClick, selected, disabled, 
       {showImage && (
         <div className={cn(
           "absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent z-20 flex flex-col items-center justify-end px-2 transition-all",
-          small ? "h-1/3 pb-1.5" : "h-1/2 pb-3 md:pb-5 group-hover:h-2/3"
+          small ? "h-1/3 pb-1.5 md:pb-2.5" : "h-1/2 pb-3 md:pb-6 group-hover:h-2/3"
         )}>
           <span className={cn(
             "text-white font-black tracking-tighter uppercase text-center leading-none drop-shadow-md",
-            small ? "text-[6px] md:text-[8px]" : "text-[10px] xs:text-[11px] md:text-sm mb-1"
+            small ? "text-[7px] xs:text-[8px] md:text-[11px]" : "text-[11px] xs:text-[13px] md:text-lg mb-1"
           )}>
             {card.name}
           </span>
           {card.description && !small && (
-             <p className="text-[7px] md:text-[9px] text-white/80 font-medium text-center leading-tight line-clamp-2 md:line-clamp-3 italic">
+             <p className="text-[7px] md:text-[10px] lg:text-xs text-white/80 font-medium text-center leading-tight line-clamp-2 md:line-clamp-3 italic px-1">
                {card.description}
              </p>
           )}
@@ -183,11 +184,14 @@ const CardUIBase: React.FC<CardUIProps> = ({ card, onClick, selected, disabled, 
       {showFallback && (
         <>
           <div className="flex flex-col items-center gap-1 z-20 w-full px-1">
-            <div className="text-white font-black text-center leading-tight drop-shadow-lg text-[10px] xs:text-xs md:text-sm">
+            <div className={cn(
+               "text-white font-black text-center leading-tight drop-shadow-lg",
+               small ? "text-[8px] md:text-[12px]" : "text-[12px] md:text-lg"
+            )}>
               {card.name}
             </div>
             {!small && card.description && (
-              <p className="text-[7px] md:text-[9px] text-white/70 font-medium text-center leading-tight line-clamp-2 italic px-2">
+              <p className="text-[8px] md:text-xs text-white/70 font-medium text-center leading-tight line-clamp-2 italic px-2">
                 {card.description}
               </p>
             )}
@@ -196,12 +200,12 @@ const CardUIBase: React.FC<CardUIProps> = ({ card, onClick, selected, disabled, 
           <div className="flex flex-1 items-center justify-center py-1 z-20 relative w-full">
             <div className={cn(
               "rounded-full flex items-center justify-center transition-all duration-500 group-hover:rotate-12",
-              small ? "p-0.5" : "p-2 md:p-4 bg-white/10 backdrop-blur-md border border-white/20 shadow-inner"
+              small ? "p-0.5" : "p-2 md:p-5 bg-white/10 backdrop-blur-md border border-white/20 shadow-inner"
             )}>
               <Icon 
                 className={cn(
                   "text-white drop-shadow-glow",
-                  small ? "w-5 h-5 md:w-6 md:h-6" : "w-10 h-10 xs:w-12 xs:h-12 md:w-16 md:h-16"
+                  small ? "w-6 h-6 md:w-8 md:h-8" : "w-12 h-12 md:w-20 md:h-20"
                 )} 
               />
             </div>
@@ -209,8 +213,8 @@ const CardUIBase: React.FC<CardUIProps> = ({ card, onClick, selected, disabled, 
 
           {!small && (
             <div className="w-full z-20">
-               <div className="bg-black/40 backdrop-blur-md rounded-lg py-0.5 md:py-1 px-1.5 md:px-2 border border-white/10 shadow-lg">
-                  <p className="text-[8px] md:text-[10px] text-white font-black text-center tracking-widest uppercase truncate">
+               <div className="bg-black/40 backdrop-blur-md rounded-lg py-1 md:py-2 px-2 border border-white/10 shadow-lg">
+                  <p className="text-[9px] md:text-xs text-white font-black text-center tracking-widest uppercase truncate">
                     {theme?.label || card.type}
                   </p>
                </div>
