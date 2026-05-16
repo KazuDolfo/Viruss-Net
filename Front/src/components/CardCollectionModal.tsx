@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useImageManager, type CardImageMap } from '../core/useImageManager';
 import { CardUI } from './CardUI';
-import { X, Lock, Save, ArrowLeft, Image as ImageIcon, CheckCircle2, Loader2 } from 'lucide-react';
+import { X, Lock, Save, ArrowLeft, Image as ImageIcon, CheckCircle2, Loader2, Smile } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { REACTIONS } from '@shared/reactions';
+import { useGameStore } from '../store/gameStore';
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -45,7 +47,11 @@ export const CardCollectionModal: React.FC<CardCollectionModalProps> = ({ isOpen
   const [isSaving, setIsSaving] = useState(false);
   const [editingCard, setEditingCard] = useState<typeof CATEGORIES[number] | null>(null);
   const [newUrl, setNewUrl] = useState('');
+  const [activeTab, setActiveTab] = useState<'cards' | 'reactions'>('cards');
+  
   const { images, updateImage } = useImageManager();
+  const addSocialEvent = useGameStore(state => state.addSocialEvent);
+  const playerId = useGameStore(state => state.playerId);
 
   if (!isOpen) return null;
 
@@ -75,6 +81,16 @@ export const CardCollectionModal: React.FC<CardCollectionModalProps> = ({ isOpen
       } else {
         alert(`Error al guardar: ${result.error}`);
       }
+    }
+  };
+
+  const testReaction = (id: string) => {
+    if (playerId) {
+      addSocialEvent({
+        playerId,
+        reactionId: id,
+        timestamp: Date.now()
+      });
     }
   };
 
@@ -136,11 +152,22 @@ export const CardCollectionModal: React.FC<CardCollectionModalProps> = ({ isOpen
             )}
             <div>
               <h2 className="text-xl md:text-3xl font-black uppercase italic tracking-tighter text-white leading-none">
-                {editingCard ? `Editando: ${editingCard.name}` : 'Colección de Cartas'}
+                {editingCard ? `Editando: ${editingCard.name}` : 'Gestión de Activos'}
               </h2>
-              <p className="text-[10px] md:text-xs font-black text-slate-500 uppercase tracking-[0.2em] mt-1">
-                {editingCard ? 'Personalización de imagen externa' : 'Gestiona los activos visuales del juego'}
-              </p>
+              <div className="flex gap-4 mt-2">
+                 <button 
+                  onClick={() => setActiveTab('cards')}
+                  className={cn("text-[10px] font-black uppercase tracking-widest transition-colors", activeTab === 'cards' ? "text-blue-400" : "text-slate-600")}
+                 >
+                   Cartas
+                 </button>
+                 <button 
+                  onClick={() => setActiveTab('reactions')}
+                  className={cn("text-[10px] font-black uppercase tracking-widest transition-colors", activeTab === 'reactions' ? "text-blue-400" : "text-slate-600")}
+                 >
+                   Reacciones
+                 </button>
+              </div>
             </div>
           </div>
           <button onClick={onClose} className="p-3 hover:bg-white/5 rounded-full transition-all text-white/20 hover:text-white">
@@ -193,8 +220,8 @@ export const CardCollectionModal: React.FC<CardCollectionModalProps> = ({ isOpen
                 </div>
               </div>
             </div>
-          ) : (
-            /* GRID VIEW */
+          ) : activeTab === 'cards' ? (
+            /* GRID VIEW - CARDS */
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 md:gap-10 pb-10">
               {CATEGORIES.map((cat) => (
                 <div 
@@ -216,6 +243,20 @@ export const CardCollectionModal: React.FC<CardCollectionModalProps> = ({ isOpen
                     </div>
                   )}
                 </div>
+              ))}
+            </div>
+          ) : (
+            /* GRID VIEW - REACTIONS TESTER */
+            <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-6 pb-10">
+              {REACTIONS.map((r) => (
+                <button 
+                  key={r.id} 
+                  onClick={() => testReaction(r.id)}
+                  className="bg-white/5 hover:bg-blue-500/20 border-2 border-white/5 hover:border-blue-500/50 p-6 rounded-[2rem] flex flex-col items-center gap-3 transition-all active:scale-90 group"
+                >
+                  <span className="text-5xl group-hover:scale-125 transition-transform">{r.value}</span>
+                  <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{r.id}</span>
+                </button>
               ))}
             </div>
           )}

@@ -1,3 +1,4 @@
+import React, { useEffect, useMemo } from 'react';
 import { SocialEvent, REACTIONS } from '@shared/reactions';
 import { useGameStore } from '../store/gameStore';
 
@@ -11,7 +12,7 @@ export const FloatingSocial: React.FC<FloatingSocialProps> = ({ playerId }) => {
   const removeEvent = useGameStore(state => state.removeSocialEvent);
 
   useEffect(() => {
-    const timers = playerEvents.map(event => {
+    const timers = playerEvents.map((event: SocialEvent) => {
       return setTimeout(() => {
         removeEvent(event.timestamp);
       }, 4000);
