@@ -42,27 +42,35 @@ export const GameTable: React.FC<GameTableProps> = ({
   const focusedPlayerId = useGameStore(state => state.focusedPlayerId);
   const setFocusedPlayerId = useGameStore(state => state.setFocusedPlayerId);
   const carouselRef = React.useRef<HTMLDivElement>(null);
+  const isProgrammaticScroll = React.useRef(false);
 
   // Sync scroll position when focusedPlayerId changes programmatically (e.g., via button click)
   React.useEffect(() => {
     if (window.innerWidth < 768 && focusedPlayerId && carouselRef.current) {
       const element = document.getElementById(`player-board-${focusedPlayerId}`);
       if (element) {
+        isProgrammaticScroll.current = true;
         element.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        
+        // Release lock after animation finishes (approx 1s)
+        const timer = setTimeout(() => {
+          isProgrammaticScroll.current = false;
+        }, 1000);
+        return () => clearTimeout(timer);
       }
     }
   }, [focusedPlayerId]);
 
   // Sync focused player when scrolling horizontally on mobile
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    if (window.innerWidth >= 768) return;
+    if (window.innerWidth >= 768 || isProgrammaticScroll.current) return;
+    
     const container = e.currentTarget;
     const scrollLeft = container.scrollLeft;
-    const itemWidth = container.offsetWidth * 0.92; // matching w-[92vw]
-    const index = Math.round(scrollLeft / (itemWidth + 16)); // +16 for gap
+    const itemWidth = container.offsetWidth * 0.92;
+    const index = Math.round(scrollLeft / (itemWidth + 16));
+    
     if (rivals[index] && rivals[index].id !== focusedPlayerId) {
-      // Use a small timeout or check to prevent feedback loops if needed, 
-      // but usually React state batching handles this.
       setFocusedPlayerId(rivals[index].id);
     }
   };
@@ -75,7 +83,7 @@ export const GameTable: React.FC<GameTableProps> = ({
         ref={carouselRef}
         onScroll={handleScroll}
         className={cn(
-          "w-full max-w-7xl flex flex-nowrap overflow-x-auto snap-x snap-mandatory gap-4 pb-4 no-scrollbar transition-all duration-500",
+          "w-full max-w-7xl flex flex-nowrap overflow-x-auto snap-x snap-mandatory gap-4 pb-4 no-scrollbar transition-all duration-500 mt-12 md:mt-0",
           "md:grid md:overflow-visible md:gap-8 md:pb-0",
           rivalsCount <= 2 ? "md:grid-cols-2" : 
           rivalsCount <= 3 ? "md:grid-cols-3" : 
@@ -98,7 +106,7 @@ export const GameTable: React.FC<GameTableProps> = ({
               canTargetOrgan={canTargetOrgan}
               onPlayerClick={handlePlayerTarget}
               canTargetPlayer={canTargetPlayer}
-              compact={window.innerWidth < 768} // Compact only on small screens
+              compact={window.innerWidth < 768}
               isGameWinner={gameState.winnerId === p.id}
             />
           </div>
@@ -106,7 +114,7 @@ export const GameTable: React.FC<GameTableProps> = ({
       </div>
 
       {/* 2. TABLE CENTERPIECE (Turn Indicator) */}
-      <div className="flex justify-center items-center py-4 md:py-8 order-first md:order-none">
+      <div className="flex justify-center items-center py-6 md:py-8">
         <div className={cn(
           "px-6 py-2 md:px-10 md:py-4 rounded-[2rem] border-2 backdrop-blur-2xl transition-all duration-700 shadow-2xl flex flex-col items-center",
           isMyTurn 
