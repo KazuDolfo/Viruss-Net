@@ -22,28 +22,27 @@ export const FloatingSocial: React.FC<FloatingSocialProps> = ({ playerId }) => {
   }, [playerEvents, removeEvent]);
 
   return (
-    <div className="absolute -top-10 md:-top-16 inset-x-0 pointer-events-none z-50 flex flex-col items-center justify-center overflow-visible">
+    <div className="absolute -top-10 md:-top-20 inset-x-0 pointer-events-none z-[100] flex flex-col items-center justify-center overflow-visible">
       {playerEvents.map((event: SocialEvent) => {
         const reaction = (REACTIONS || []).find(r => r.id === event.reactionId);
-        const emojiValue = reaction?.value;
         
         return (
           <div 
             key={event.timestamp}
-            className="absolute left-1/2 -translate-x-1/2 animate-in fade-in zoom-in slide-in-from-bottom-4 duration-500 flex flex-col items-center w-full"
+            className="absolute left-1/2 -translate-x-1/2 animate-social-burst flex flex-col items-center w-full"
           >
-            {/* EMOJI BURST */}
+            {/* EMOJI */}
             {event.reactionId && (
-              <div className="text-5xl md:text-7xl animate-bounce-social drop-shadow-2xl mb-1">
-                {emojiValue || "❓"}
+              <div className="text-6xl md:text-8xl drop-shadow-2xl mb-2">
+                {reaction?.value || "❓"}
               </div>
             )}
 
-            {/* TEXT BUBBLE */}
+            {/* TEXT */}
             {event.text && (
-              <div className="bg-white text-slate-900 px-4 py-2 rounded-2xl font-black text-xs md:text-base shadow-[0_15px_40px_rgba(0,0,0,0.4)] relative animate-in slide-in-from-bottom-2 duration-300 max-w-[90%] text-center border-2 border-slate-900/5">
+              <div className="bg-white text-slate-900 px-6 py-3 rounded-2xl font-black text-sm md:text-xl shadow-2xl relative border-2 border-slate-200 text-center whitespace-nowrap">
                 {event.text}
-                <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white rotate-45 border-r-2 border-b-2 border-slate-900/5" />
+                <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white rotate-45 border-r-2 border-b-2 border-slate-200" />
               </div>
             )}
           </div>
