@@ -39,7 +39,7 @@ export const GameTable: React.FC<GameTableProps> = ({
   const rivalsCount = rivals.length;
 
   return (
-    <main className="flex-1 relative overflow-y-auto lg:overflow-hidden px-3 md:px-8 pt-[70px] md:pt-20 pb-[250px] lg:pb-8 no-scrollbar layer-world flex flex-col items-center">
+    <main className="flex-1 relative overflow-y-auto lg:overflow-hidden px-3 md:px-8 pt-[30px] md:pt-12 pb-[250px] lg:pb-8 no-scrollbar layer-world flex flex-col items-center">
       {/* Dynamic Grid Layout */}
       <div className={cn(
         "w-full max-w-7xl flex flex-col gap-6 md:gap-8 transition-all duration-500",

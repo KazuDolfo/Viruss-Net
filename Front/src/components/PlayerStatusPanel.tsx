@@ -17,8 +17,8 @@ export const PlayerStatusPanel: React.FC = () => {
   };
 
   return (
-    <div className="fixed top-[calc(var(--safe-top)+3.5rem)] md:top-[calc(var(--safe-top)+5.5rem)] left-0 right-0 z-30 px-3 md:hidden">
-      <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2">
+    <div className="fixed top-[calc(var(--safe-top)+0.5rem)] left-0 right-0 z-30 px-3 flex justify-end md:hidden pointer-events-none">
+      <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2 pointer-events-auto max-w-[60vw]">
         {gameState.players.map((player) => {
           const isMe = player.id === myPlayerId;
           const isCurrentTurn = gameState.players[gameState.currentPlayerIndex].id === player.id;
