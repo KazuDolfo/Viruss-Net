@@ -21,14 +21,14 @@ export const FloatingSocial: React.FC<FloatingSocialProps> = ({ playerId }) => {
   }, [playerEvents, removeEvent]);
 
   return (
-    <div className="absolute inset-0 pointer-events-none z-50 flex items-center justify-center overflow-visible">
+    <div className="absolute -top-12 md:-top-20 inset-x-0 pointer-events-none z-50 flex flex-col items-center justify-center overflow-visible">
       {playerEvents.map((event: SocialEvent) => {
         const reaction = (REACTIONS || []).find(r => r.id === event.reactionId);
         
         return (
           <div 
             key={event.timestamp}
-            className="absolute animate-in fade-in zoom-in duration-500 flex flex-col items-center"
+            className="absolute animate-in fade-in zoom-in slide-in-from-bottom-4 duration-500 flex flex-col items-center"
           >
             {/* EMOJI BURST */}
             {reaction && (

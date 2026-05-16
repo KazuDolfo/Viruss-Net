@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Smile, Send } from 'lucide-react';
-import { REACTIONS } from '@shared/index';
+import { Smile, Send, Zap } from 'lucide-react';
+import { REACTIONS } from '@shared/reactions';
 import { cn } from '../utils/cn';
 
 interface SocialDockProps {
@@ -22,16 +22,18 @@ export const SocialDock: React.FC<SocialDockProps> = ({ onSendReaction, onSendMe
     }
   };
 
+  const reactionList = REACTIONS || [];
+
   return (
     <div className="fixed bottom-[var(--hand-height,140px)] right-4 z-50 flex flex-col items-end gap-3 pointer-events-auto">
       {/* Reaction Panel */}
       {isOpen && (
-        <div className="bg-slate-900/90 backdrop-blur-2xl p-2 rounded-2xl border border-white/10 shadow-2xl flex flex-col gap-2 animate-in fade-in slide-in-from-bottom-4 duration-300">
-          {(REACTIONS || []).map((r) => (
+        <div className="bg-slate-900/95 backdrop-blur-2xl p-3 rounded-[1.5rem] border-2 border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col gap-2 animate-in fade-in slide-in-from-bottom-4 duration-300 min-w-[60px]">
+          {reactionList.map((r) => (
             <button
               key={r.id}
               onClick={() => { onSendReaction(r.id); setIsOpen(false); }}
-              className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center text-2xl md:text-3xl hover:scale-125 transition-transform"
+              className="w-12 h-12 md:w-14 md:h-14 flex items-center justify-center text-3xl md:text-4xl hover:scale-125 transition-transform bg-white/5 rounded-xl hover:bg-white/10"
             >
               {r.value}
             </button>
@@ -66,6 +68,7 @@ export const SocialDock: React.FC<SocialDockProps> = ({ onSendReaction, onSendMe
             "w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center transition-all shadow-xl border-2",
             isOpen ? "bg-yellow-500 border-white text-black" : "bg-slate-800/80 border-white/10 text-white/60 hover:bg-slate-700"
           )}
+          title="Reacciones"
         >
           <Smile size={24} />
         </button>
@@ -76,8 +79,9 @@ export const SocialDock: React.FC<SocialDockProps> = ({ onSendReaction, onSendMe
             "w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center transition-all shadow-xl border-2",
             showChat ? "bg-blue-600 border-white text-white" : "bg-slate-800/80 border-white/10 text-white/60 hover:bg-slate-700"
           )}
+          title="Chat"
         >
-          <span className="text-xl md:text-2xl">⚡</span>
+          <Zap size={24} />
         </button>
       </div>
     </div>
