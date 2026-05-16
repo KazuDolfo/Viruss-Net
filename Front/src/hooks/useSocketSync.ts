@@ -67,6 +67,10 @@ export const useSocketSync = () => {
       setIsDrawingState(false);
     };
 
+    const onSocialEvent = (event: any) => {
+      useGameStore.getState().addSocialEvent(event);
+    };
+
     const onError = (error: string) => {
       console.error('🔥 Game Error:', error);
     };
@@ -114,6 +118,4 @@ export const useSocketSync = () => {
   ]);
 
   return { isConnected: socket.connected };
-};
-ted };
 };

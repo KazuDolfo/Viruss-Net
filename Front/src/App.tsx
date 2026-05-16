@@ -4,6 +4,7 @@ import { GameTable } from './components/GameTable';
 import { GameHeader } from './components/GameHeader';
 import { PlayerHand } from './components/PlayerHand';
 import { ActionOverlay } from './components/ActionOverlay';
+import { SocialDock } from './components/SocialDock';
 import { CardCollectionModal } from './components/CardCollectionModal';
 
 // Hooks & Store
@@ -13,8 +14,7 @@ import { useGameActions } from './hooks/useGameActions';
 import { useTargeting } from './hooks/useTargeting';
 import { useImageManager } from './core/useImageManager';
 import { sessionManager } from './core/session';
-
-import { ScrollText, CheckCircle2 } from 'lucide-react';
+import { socket } from './core/socket';
 
 const LoadingBar = () => {
   const progress = useImageManager(state => state.loadProgress);
@@ -33,7 +33,7 @@ const LoadingBar = () => {
 };
 
 const App: React.FC = () => {
-  const { isConnected } = useSocketSync(); 
+  useSocketSync(); 
   const gameState = useGameStore(state => state.gameState);
   const playerId = useGameStore(state => state.playerId);
   const roomPlayers = useGameStore(state => state.roomPlayers);
@@ -41,6 +41,7 @@ const App: React.FC = () => {
   const roomCode = useGameStore(state => state.roomCode);
   const setPlayerId = useGameStore(state => state.setPlayerId);
   const setRoomCode = useGameStore(state => state.setRoomCode);
+  const isConnected = useGameStore(state => state.isConnected);
 
   const { joinRoom, startGame, sendAction, leaveRoom } = useGameActions();
   const { 
@@ -59,8 +60,6 @@ const App: React.FC = () => {
   const [playerName, setPlayerName] = useState('');
   const [copied, setCopied] = useState(false);
   const [isCollectionOpen, setIsCollectionOpen] = useState(false);
-
-  const isConnected = useGameStore(state => state.isConnected);
 
   const sendReaction = (reactionId: string) => {
     if (roomCode && playerId) {
@@ -87,7 +86,7 @@ const App: React.FC = () => {
       currentToken = Math.random().toString(36).substr(2, 16);
     }
 
-    sessionManager.save({ playerId: currentPId, sessionToken: currentToken });
+    sessionManager.save({ ...session, playerId: currentPId, sessionToken: currentToken });
     setPlayerId(currentPId);
   }, [setPlayerId]);
 
