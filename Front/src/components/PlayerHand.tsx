@@ -44,9 +44,9 @@ export const PlayerHand: React.FC<PlayerHandProps> = ({
 
         {/* COMPRESSED HAND ENGINE */}
         <div className={cn(
-          "flex justify-center items-end transition-all duration-500",
-          // More space on PC, overlap on mobile
-          "-space-x-12 xs:-space-x-16 md:gap-4 md:space-x-0"
+          "flex justify-center items-end transition-all duration-500 px-4",
+          // Overlap on mobile/tablet, slight gap on PC
+          "-space-x-12 xs:-space-x-16 md:-space-x-20 lg:space-x-4"
         )}>
           {hand.map((card, index) => {
             const isSelected = selectedCards.some(c => c.id === card.id);
@@ -57,9 +57,9 @@ export const PlayerHand: React.FC<PlayerHandProps> = ({
                   "relative transition-all duration-300 ease-out will-change-transform transform-gpu",
                   // Dynamic Z-Index: selected cards always on top, others follow index
                   isSelected ? "z-50 -translate-y-6 md:-translate-y-12 scale-110" : "z-[index] hover:z-40 hover:-translate-y-8 hover:scale-105",
-                  // Fan effect only on mobile/tablet, straight on PC
-                  index === 0 && hand.length > 1 && "-rotate-3 md:rotate-0",
-                  index === hand.length - 1 && hand.length > 1 && "rotate-3 md:rotate-0"
+                  // Fan effect: keep it subtle on mobile, straight on large PC
+                  index === 0 && hand.length > 1 && "-rotate-3 lg:rotate-0",
+                  index === hand.length - 1 && hand.length > 1 && "rotate-3 lg:rotate-0"
                 )}
                 style={{ zIndex: isSelected ? 50 : 10 + index }}
               >

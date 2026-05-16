@@ -132,8 +132,10 @@ const CardUIBase: React.FC<CardUIProps> = ({ card, onClick, selected, disabled, 
       className={cn(
         'relative flex flex-col items-center justify-between rounded-[0.75rem] md:rounded-[1.25rem] border-[2px] md:border-[4px] p-1.5 md:p-2.5 transition-all cursor-pointer shadow-xl select-none touch-manipulation overflow-hidden group bg-gradient-to-b will-change-transform aspect-[var(--card-aspect)] shrink-0',
         colorMap[card.color],
-        // Fluid width based on CSS variables
-        small ? 'w-[var(--card-w-small)]' : 'w-[var(--card-w-base)]',
+        // Responsive scaling: Clamp dimensions for fluid feel, but with strict max-widths for mobile/tablet
+        small 
+          ? 'w-[var(--card-w-small)] max-w-[80px] md:max-w-[110px] lg:max-w-[140px]' 
+          : 'w-[var(--card-w-base)] max-w-[110px] xs:max-w-[130px] md:max-w-[180px] lg:max-w-[240px]',
         selected ? 'ring-4 ring-white -translate-y-4 scale-105 z-20 shadow-[0_0_40px_rgba(255,255,255,0.5)]' : !small && 'hover:-translate-y-2 hover:scale-[1.02]',
         disabled && 'opacity-40 grayscale cursor-not-allowed',
         className
