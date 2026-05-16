@@ -39,7 +39,7 @@ export const GameTable: React.FC<GameTableProps> = ({
   const rivalsCount = rivals.length;
 
   return (
-    <main className="flex-1 relative overflow-y-auto lg:overflow-hidden px-3 md:px-8 pt-[90px] md:pt-28 pb-[250px] lg:pb-8 no-scrollbar layer-world flex flex-col items-center">
+    <main className="flex-1 relative overflow-y-auto lg:overflow-hidden px-3 md:px-8 pt-[125px] md:pt-28 pb-[250px] lg:pb-8 no-scrollbar layer-world flex flex-col items-center">
       {/* Dynamic Grid Layout */}
       <div className={cn(
         "w-full max-w-7xl flex flex-col gap-6 md:gap-8 transition-all duration-500",
@@ -54,7 +54,11 @@ export const GameTable: React.FC<GameTableProps> = ({
           "md:grid-cols-3 lg:grid-cols-5"
         )}>
           {rivals.map((p) => (
-            <div key={p.id} className="w-[92vw] md:w-auto shrink-0 snap-center transform hover:scale-[1.01] transition-transform duration-500">
+            <div 
+              key={p.id} 
+              id={`player-board-${p.id}`}
+              className="w-[92vw] md:w-auto shrink-0 snap-center transform hover:scale-[1.01] transition-transform duration-500"
+            >
               <PlayerBoard 
                 player={p} 
                 isActive={p.id === currentPlayer.id} 
@@ -72,7 +76,7 @@ export const GameTable: React.FC<GameTableProps> = ({
         </div>
 
         {/* Local Player Stage (Always highlighted in its own area) */}
-        <div className="w-full flex justify-center mt-2 md:mt-4">
+        <div id={`player-board-${myPlayer.id}`} className="w-full flex justify-center mt-2 md:mt-4">
           <div className="w-full max-w-3xl transform hover:scale-[1.01] transition-transform duration-500">
             <PlayerBoard 
               player={myPlayer} 

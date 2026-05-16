@@ -3,6 +3,7 @@ import { Lobby } from './components/Lobby';
 import { GameTable } from './components/GameTable';
 import { GameHeader } from './components/GameHeader';
 import { PlayerHand } from './components/PlayerHand';
+import { PlayerStatusPanel } from './components/PlayerStatusPanel';
 import { ActionOverlay } from './components/ActionOverlay';
 import { SocialDock } from './components/SocialDock';
 import { CardCollectionModal } from './components/CardCollectionModal';
@@ -190,6 +191,7 @@ const App: React.FC = () => {
           onLeave={leaveRoom}
           isConnected={isConnected}
         />
+        <PlayerStatusPanel />
         <PlayerHand 
           hand={myPlayer.hand} selectedCards={selectedCards}
           onCardClick={handleCardClick} isMyTurn={isMyTurn}
