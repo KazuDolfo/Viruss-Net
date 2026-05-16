@@ -8,21 +8,22 @@ interface FloatingSocialProps {
 }
 
 export const FloatingSocial: React.FC<FloatingSocialProps> = ({ playerId }) => {
-  const events = useGameStore(state => state.activeSocialEvents.filter(e => e.playerId === playerId));
+  const events = useGameStore(state => state.activeSocialEvents);
+  const playerEvents = useMemo(() => events.filter(e => e.playerId === playerId), [events, playerId]);
   const removeEvent = useGameStore(state => state.removeSocialEvent);
 
   useEffect(() => {
-    events.forEach(event => {
+    playerEvents.forEach(event => {
       const timer = setTimeout(() => {
         removeEvent(event.timestamp);
       }, 4000); // 4 seconds life
       return () => clearTimeout(timer);
     });
-  }, [events, removeEvent]);
+  }, [playerEvents, removeEvent]);
 
   return (
     <div className="absolute inset-0 pointer-events-none z-50 flex items-center justify-center overflow-visible">
-      {events.map((event) => {
+      {playerEvents.map((event) => {
         const reaction = REACTIONS.find(r => r.id === event.reactionId);
         
         return (

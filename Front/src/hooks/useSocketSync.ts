@@ -93,11 +93,6 @@ export const useSocketSync = () => {
     
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
-    // Initial check if already connected
-    if (socket.connected) {
-      onConnect();
-    }
-
     return () => {
       socket.off('connect', onConnect);
       socket.off('disconnect', onDisconnect);
