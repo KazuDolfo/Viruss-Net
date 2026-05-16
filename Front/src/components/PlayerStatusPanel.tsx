@@ -12,39 +12,42 @@ export const PlayerStatusPanel: React.FC = () => {
   const scrollToPlayer = (playerId: string) => {
     const element = document.getElementById(`player-board-${playerId}`);
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+      // scrollIntoView with 'start' block is more reliable on mobile to bring the element to the top
+      element.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'center' });
+      
+      // Since we have a floating HUD, we might need a tiny bit of extra scroll
+      // but 'start' usually handles the nearest scrollable container correctly.
     }
   };
 
   return (
     <div className="fixed top-[calc(var(--safe-top)+0.5rem)] left-0 right-0 z-30 px-3 flex justify-end md:hidden pointer-events-none">
-      <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2 pointer-events-auto max-w-[60vw]">
+      <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2 pointer-events-auto max-w-[75vw]">
         {gameState.players.map((player) => {
           const isMe = player.id === myPlayerId;
           const isCurrentTurn = gameState.players[gameState.currentPlayerIndex].id === player.id;
           const healthyOrgans = player.body.filter(o => o.medicines.length === 0 && o.viruses.length === 0).length;
-          const totalOrgans = player.body.length;
-
+          
           return (
             <button
               key={player.id}
               onClick={() => scrollToPlayer(player.id)}
               className={cn(
-                "flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all shrink-0 shadow-lg backdrop-blur-md",
+                "flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all shrink-0 shadow-lg backdrop-blur-md active:scale-95",
                 isCurrentTurn 
-                  ? "bg-yellow-500/20 border-yellow-500 shadow-yellow-500/10" 
-                  : "bg-slate-900/80 border-white/10"
+                  ? "bg-yellow-500/30 border-yellow-500 shadow-yellow-500/20" 
+                  : "bg-slate-900/90 border-white/10"
               )}
             >
               <div className="flex flex-col items-start">
                 <div className="flex items-center gap-1.5">
                   <span className={cn(
-                    "text-[10px] font-black uppercase tracking-tight truncate max-w-[60px]",
-                    isCurrentTurn ? "text-yellow-400" : "text-white/70"
+                    "text-[10px] font-black uppercase tracking-tight truncate max-w-[80px]",
+                    isCurrentTurn ? "text-yellow-400" : "text-white/80"
                   )}>
                     {isMe ? "TÚ" : player.name}
                   </span>
-                  {isCurrentTurn && <div className="w-1 h-1 bg-yellow-400 rounded-full animate-pulse" />}
+                  {isCurrentTurn && <div className="w-1.5 h-1.5 bg-yellow-400 rounded-full animate-pulse shadow-[0_0_5px_rgba(234,179,8,1)]" />}
                 </div>
                 
                 <div className="flex gap-0.5 mt-0.5">
