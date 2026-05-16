@@ -45,8 +45,8 @@ export const PlayerHand: React.FC<PlayerHandProps> = ({
         {/* COMPRESSED HAND ENGINE */}
         <div className={cn(
           "flex justify-center items-end transition-all duration-500 px-4",
-          // Overlap on mobile/tablet, slight gap on PC
-          "-space-x-12 xs:-space-x-16 md:-space-x-20 lg:space-x-4"
+          // Increased breathing room: less negative space across all breakpoints
+          "-space-x-6 xs:-space-x-8 md:-space-x-10 lg:space-x-8"
         )}>
           {hand.map((card, index) => {
             const isSelected = selectedCards.some(c => c.id === card.id);
