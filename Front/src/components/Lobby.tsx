@@ -1,5 +1,5 @@
 import React from 'react';
-import { LogIn, Play, Copy, CheckCircle2, Users } from 'lucide-react';
+import { LogIn, Play, Copy, CheckCircle2, Users, Zap } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -13,6 +13,7 @@ interface LobbyProps {
   localRoomId: string;
   setLocalRoomId: (id: string) => void;
   onJoinRoom: () => void;
+  onLeave: () => void;
   roomPlayers: { id: string, name: string }[];
   playerId: string | null;
   roomCode: string | null;
@@ -28,6 +29,7 @@ export const Lobby: React.FC<LobbyProps> = ({
   localRoomId,
   setLocalRoomId,
   onJoinRoom,
+  onLeave,
   roomPlayers,
   playerId,
   roomCode,
@@ -73,9 +75,18 @@ export const Lobby: React.FC<LobbyProps> = ({
       ) : (
         <>
           <div className="flex justify-between items-center mb-6 xs:mb-8">
-            <h2 className="text-xl xs:text-3xl font-bold text-slate-300 flex items-center gap-2 xs:gap-3 uppercase tracking-tighter">
-              <Users className="text-blue-500" /> Sala de Espera
-            </h2>
+            <div className="flex items-center gap-2 xs:gap-4">
+              <button 
+                onClick={onLeave}
+                className="p-2 xs:p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 hover:bg-red-500 hover:text-white transition-all shadow-lg"
+                title="Salir de la sala"
+              >
+                <Zap size={18} className="rotate-180" />
+              </button>
+              <h2 className="text-xl xs:text-3xl font-bold text-slate-300 flex items-center gap-2 xs:gap-3 uppercase tracking-tighter">
+                <Users className="text-blue-500 w-5 xs:w-8" /> Sala
+              </h2>
+            </div>
             <button 
               onClick={copyRoomId} 
               className="flex items-center gap-2 bg-slate-700 hover:bg-slate-600 px-3 xs:px-4 py-1.5 xs:py-2 rounded-xl text-[10px] xs:text-xs font-bold transition-all border border-white/5"

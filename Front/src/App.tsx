@@ -129,7 +129,8 @@ const App: React.FC = () => {
         <Lobby 
           playerName={playerName} setPlayerName={setPlayerName}
           localRoomId={localRoomId} setLocalRoomId={setLocalRoomId}
-          onJoinRoom={onJoinRoom} roomPlayers={roomPlayers}
+          onJoinRoom={onJoinRoom} onLeave={leaveRoom}
+          roomPlayers={roomPlayers}
           playerId={playerId} roomCode={roomCode}
           copyRoomId={() => { navigator.clipboard.writeText(roomCode || ''); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
           copied={copied} onStartGame={() => roomCode && startGame()}
