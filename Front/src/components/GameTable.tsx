@@ -41,6 +41,17 @@ export const GameTable: React.FC<GameTableProps> = ({
   const rivalsCount = rivals.length;
   const focusedPlayerId = useGameStore(state => state.focusedPlayerId);
   const setFocusedPlayerId = useGameStore(state => state.setFocusedPlayerId);
+  const carouselRef = React.useRef<HTMLDivElement>(null);
+
+  // Sync scroll position when focusedPlayerId changes programmatically (e.g., via button click)
+  React.useEffect(() => {
+    if (window.innerWidth < 768 && focusedPlayerId && carouselRef.current) {
+      const element = document.getElementById(`player-board-${focusedPlayerId}`);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      }
+    }
+  }, [focusedPlayerId]);
 
   // Sync focused player when scrolling horizontally on mobile
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
@@ -50,6 +61,8 @@ export const GameTable: React.FC<GameTableProps> = ({
     const itemWidth = container.offsetWidth * 0.92; // matching w-[92vw]
     const index = Math.round(scrollLeft / (itemWidth + 16)); // +16 for gap
     if (rivals[index] && rivals[index].id !== focusedPlayerId) {
+      // Use a small timeout or check to prevent feedback loops if needed, 
+      // but usually React state batching handles this.
       setFocusedPlayerId(rivals[index].id);
     }
   };
@@ -59,6 +72,7 @@ export const GameTable: React.FC<GameTableProps> = ({
       
       {/* 1. RIVALS AREA (Carousel on Mobile, Grid on Desktop) */}
       <div 
+        ref={carouselRef}
         onScroll={handleScroll}
         className={cn(
           "w-full max-w-7xl flex flex-nowrap overflow-x-auto snap-x snap-mandatory gap-4 pb-4 no-scrollbar transition-all duration-500",
