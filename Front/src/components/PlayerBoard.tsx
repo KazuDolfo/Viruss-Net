@@ -46,15 +46,15 @@ const PlayerBoardBase: React.FC<PlayerBoardProps> = ({
           <div className="absolute inset-0 bg-blue-500/10 z-10 pointer-events-none" />
       )}
 
-      <div className="flex justify-between items-center mb-2 md:mb-4 px-1 relative z-10">
-        <div className="flex items-center gap-2 md:gap-3 min-w-0">
+      <div className="flex justify-between items-center mb-2 md:mb-4 px-1 relative z-10 gap-2">
+        <div className="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
           <h2 className={cn(
-             'font-black uppercase tracking-tight truncate flex items-center gap-1.5',
+             'font-black uppercase tracking-tight flex items-center gap-1.5 min-w-0',
              isActive ? 'text-yellow-400' : 'text-slate-200',
              compact ? 'text-xs md:text-sm' : 'text-sm xs:text-base md:text-2xl'
            )}>
-            {player.name}
-            {isGameWinner && <span className="text-yellow-500 drop-shadow-[0_0_10px_rgba(234,179,8,0.8)]">🏆</span>}
+            <span className="truncate">{player.name}</span>
+            {isGameWinner && <span className="text-yellow-500 drop-shadow-[0_0_10px_rgba(234,179,8,0.8)] shrink-0">🏆</span>}
           </h2>
           {isActive && <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-yellow-400 rounded-full animate-pulse shadow-[0_0_10px_rgba(234,179,8,1)] shrink-0" />}
         </div>
@@ -63,15 +63,15 @@ const PlayerBoardBase: React.FC<PlayerBoardProps> = ({
           "font-black rounded-full bg-black/40 px-2 py-0.5 md:px-3 md:py-1 border border-white/10 text-white/80 shadow-inner shrink-0",
           compact ? 'text-[8px] md:text-[9px]' : 'text-[9px] md:text-xs'
         )}>
-          {player.body.length}/4 <span className="hidden xs:inline opacity-60">ÓRGANOS</span>
+          {player.body.length}/4 <span className="hidden sm:inline opacity-60">ÓRGANOS</span>
         </div>
       </div>
 
       {/* Organs Area - Uses CSS Grid for perfect alignment */}
       <div className={cn(
-        "grid gap-2 md:gap-4 items-center justify-items-center border-2 border-dashed border-white/5 rounded-xl md:rounded-2xl bg-black/20 p-2 md:p-4 min-h-[140px] xs:min-h-[160px] md:min-h-[200px]",
-        // On mobile we prefer 4 columns if possible to save vertical space
-        "grid-cols-4 sm:grid-cols-2 lg:grid-cols-4"
+        "grid gap-2 md:gap-4 items-center justify-items-center border-2 border-dashed border-white/5 rounded-xl md:rounded-2xl bg-black/20 p-2 md:p-4 min-h-[120px] xs:min-h-[140px] md:min-h-[180px]",
+        // Always 4 columns to save vertical space and maintain consistent layout
+        "grid-cols-4"
       )}>
         {slots.map((idx) => {
           const organ = player.body[idx];

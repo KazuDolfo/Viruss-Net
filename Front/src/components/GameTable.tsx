@@ -37,16 +37,16 @@ export const GameTable: React.FC<GameTableProps> = ({
   neverTargetPlayer
 }) => {
   return (
-    <main className="flex-1 relative overflow-y-auto lg:overflow-hidden px-3 md:px-8 py-4 no-scrollbar pb-[300px] lg:pb-8 layer-world">
+    <main className="flex-1 relative overflow-y-auto lg:overflow-hidden px-3 md:px-8 pt-20 md:pt-28 pb-[240px] lg:pb-8 no-scrollbar layer-world">
       {/* Dynamic Grid Layout */}
       <div className={cn(
         "grid gap-4 md:gap-8 transition-all duration-500",
-        // Mobile: rivals at top, Tablet: 2 cols, Desktop: 3 cols
+        // Mobile: 1 col, Tablet: 2 cols, Desktop: 3 cols
         "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 items-start justify-center max-w-7xl mx-auto"
       )}>
         
         {/* Rivals Area */}
-        <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-1 lg:grid-cols-2 gap-4 sm:col-span-2 lg:col-span-2 order-1">
+        <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-2 gap-4 sm:col-span-2 lg:col-span-2 order-1">
           {rivals.map((p) => (
             <div key={p.id} className="w-full transform hover:scale-[1.01] transition-transform duration-500">
               <PlayerBoard 
