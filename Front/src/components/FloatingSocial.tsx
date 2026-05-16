@@ -1,5 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
-import { SocialEvent, REACTIONS } from '@shared/index';
+import { SocialEvent, REACTIONS } from '@shared/reactions';
 import { useGameStore } from '../store/gameStore';
 
 interface FloatingSocialProps {
@@ -8,7 +7,7 @@ interface FloatingSocialProps {
 
 export const FloatingSocial: React.FC<FloatingSocialProps> = ({ playerId }) => {
   const events = useGameStore(state => state.activeSocialEvents);
-  const playerEvents = useMemo(() => events.filter(e => e.playerId === playerId), [events, playerId]);
+  const playerEvents = useMemo(() => (events || []).filter(e => e.playerId === playerId), [events, playerId]);
   const removeEvent = useGameStore(state => state.removeSocialEvent);
 
   useEffect(() => {
@@ -22,9 +21,10 @@ export const FloatingSocial: React.FC<FloatingSocialProps> = ({ playerId }) => {
   }, [playerEvents, removeEvent]);
 
   return (
-    <div className="absolute -top-12 md:-top-20 inset-x-0 pointer-events-none z-50 flex flex-col items-center justify-center overflow-visible">
+    <div className="absolute -top-10 md:-top-16 inset-x-0 pointer-events-none z-50 flex flex-col items-center justify-center overflow-visible">
       {playerEvents.map((event: SocialEvent) => {
         const reaction = (REACTIONS || []).find(r => r.id === event.reactionId);
+        const emojiValue = reaction?.value;
         
         return (
           <div 
@@ -32,9 +32,9 @@ export const FloatingSocial: React.FC<FloatingSocialProps> = ({ playerId }) => {
             className="absolute left-1/2 -translate-x-1/2 animate-in fade-in zoom-in slide-in-from-bottom-4 duration-500 flex flex-col items-center w-full"
           >
             {/* EMOJI BURST */}
-            {reaction && (
+            {event.reactionId && (
               <div className="text-5xl md:text-7xl animate-bounce-social drop-shadow-2xl mb-1">
-                {reaction.value}
+                {emojiValue || "❓"}
               </div>
             )}
 
