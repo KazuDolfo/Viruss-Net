@@ -20,12 +20,14 @@ export const PlayerHand: React.FC<PlayerHandProps> = ({
   isDrawingState
 }) => {
   return (
-    <div className={cn(
-      "fixed bottom-0 left-0 right-0 z-40 transition-all duration-700 ease-in-out px-2 pb-2 md:pb-4 pt-4",
-      isMyTurn ? "translate-y-0" : "translate-y-[85%] opacity-60 hover:translate-y-0 hover:opacity-100"
-    )}>
+    <div 
+      className={cn(
+        "fixed bottom-0 left-0 right-0 z-40 transition-all duration-700 ease-in-out px-2 pb-[calc(var(--safe-bottom)+0.5rem)] pt-4",
+        isMyTurn ? "translate-y-0" : "translate-y-[calc(100%-3rem)] opacity-60 hover:translate-y-0 hover:opacity-100"
+      )}
+    >
       {/* GLOW BACKGROUND EFFECT */}
-      <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-slate-950/80 to-transparent pointer-events-none" />
+      <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-slate-950/95 to-transparent pointer-events-none" />
 
       <div className="max-w-screen-xl mx-auto relative z-10">
         {/* Indicators */}

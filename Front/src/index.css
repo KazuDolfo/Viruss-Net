@@ -26,15 +26,15 @@
   --z-modal: 100;
 
   /* Fluid Card Dimensions */
-  --card-w-base: clamp(82px, 13vw, 215px);
-  --card-w-small: clamp(72px, 11vw, 130px);
+  --card-w-base: clamp(75px, 12vw, 215px);
+  --card-w-small: clamp(60px, 10vw, 130px);
   --card-aspect: 2/3;
   
   /* HUD & Gaming Constraints */
-  --hand-height: clamp(120px, 20vh, 170px);
+  --hand-height: clamp(100px, 18vh, 160px);
   --board-stable-height: 100px;
   --safe-top: env(safe-area-inset-top, 0px);
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 16px);
 }
 
 @layer utilities {
