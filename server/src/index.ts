@@ -2,7 +2,7 @@ import express from 'express';
 import { createServer } from 'http';
 import { Server, Socket } from 'socket.io';
 import cors from 'cors';
-import { createRoom, joinRoom, startGame, getRoom, processAction, cleanupRooms } from './gameManager';
+import { createRoom, joinRoom, startGame, getRoom, processAction, cleanupRooms, handleDisconnect } from './gameManager';
 import cardImagesRouter from './routes/cardImages';
 import { logger } from './core/logger';
 
@@ -147,6 +147,25 @@ io.on('connection', (socket: Socket) => {
 
   socket.on('disconnect', () => {
     logger.info('User disconnected', { socketId: socket.id });
+    const result = handleDisconnect(socket.id);
+    
+    if (result.roomId) {
+        const room = getRoom(result.roomId);
+        if (room) {
+            io.to(result.roomId).emit('room_update', { 
+                players: room.players.map(p => ({ id: p.id, name: p.name })),
+                status: room.status 
+            });
+
+            if (result.winnerId && room.gameState) {
+                const winner = room.players.find(p => p.id === result.winnerId);
+                io.to(result.roomId).emit('game_over', { winner: winner ? winner.name : 'Unknown' });
+                room.players.forEach(p => {
+                    io.to(p.socketId).emit('game_update', sanitizeState(room.gameState, p.id));
+                });
+            }
+        }
+    }
   });
 });
 

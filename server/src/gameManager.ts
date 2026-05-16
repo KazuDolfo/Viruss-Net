@@ -100,6 +100,37 @@ export const processAction = (roomId: string, playerId: string, action: GameActi
     return nextState;
 };
 
+export const handleDisconnect = (socketId: string) => {
+    let affectedRoomId: string | null = null;
+    let winnerId: string | null = null;
+
+    Object.keys(rooms).forEach(roomId => {
+        const room = rooms[roomId];
+        const playerIndex = room.players.findIndex(p => p.socketId === socketId);
+        
+        if (playerIndex !== -1) {
+            affectedRoomId = roomId;
+            // Remove player from room list
+            room.players.splice(playerIndex, 1);
+            
+            // If game is active and only 1 player remains, they win
+            if (room.status === 'playing' && room.players.length === 1) {
+                winnerId = room.players[0].id;
+                room.status = 'finished';
+                if (room.gameState) room.gameState.winnerId = winnerId;
+            }
+
+            // Cleanup empty rooms
+            if (room.players.length === 0) {
+                delete rooms[roomId];
+                affectedRoomId = null; // No need to notify
+            }
+        }
+    });
+
+    return { roomId: affectedRoomId, winnerId };
+};
+
 export const cleanupRooms = () => {
     const now = Date.now();
     const TTL = 1000 * 60 * 60; // 1 hour of inactivity
