@@ -43,9 +43,9 @@ export const GameTable: React.FC<GameTableProps> = ({
 
   return (
     <main className="flex-1 relative overflow-y-auto lg:overflow-hidden px-3 md:px-8 pt-[30px] md:pt-12 pb-[250px] lg:pb-8 no-scrollbar layer-world flex flex-col items-center">
-      {/* 1. MOBILE FOCUS VIEW (Single Board) */}
+      {/* 1. MOBILE FOCUS VIEW (Single Rival Board) */}
       <div className="md:hidden w-full max-w-lg animate-in fade-in zoom-in-95 duration-500 mt-12">
-        {gameState.players.map((p) => (
+        {rivals.map((p) => (
           p.id === focusedPlayerId && (
             <div key={p.id} className="w-full">
               <PlayerBoard 
@@ -57,16 +57,17 @@ export const GameTable: React.FC<GameTableProps> = ({
                 onOrganClick={handleOrganClick} 
                 canTargetOrgan={canTargetOrgan}
                 onPlayerClick={handlePlayerTarget}
-                canTargetPlayer={p.id === myPlayer.id ? neverTargetPlayer : canTargetPlayer}
-                compact={false} // Full size in focus mode
+                canTargetPlayer={canTargetPlayer}
+                compact={false}
                 isGameWinner={gameState.winnerId === p.id}
               />
             </div>
           )
         ))}
+        {/* Local player board is HIDDEN on mobile as per request */}
       </div>
 
-      {/* 2. DESKTOP GRID VIEW (Original Layout) */}
+      {/* 2. DESKTOP GRID VIEW (Both Rivals and Local) */}
       <div className={cn(
         "hidden md:flex w-full max-w-7xl flex-col gap-8 transition-all duration-500",
       )}>

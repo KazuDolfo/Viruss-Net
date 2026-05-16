@@ -24,65 +24,65 @@ export const PlayerStatusPanel: React.FC = () => {
 
   return (
     <div className="fixed top-[calc(var(--safe-top)+0.5rem)] left-0 right-0 z-30 px-3 flex justify-end md:hidden pointer-events-none">
-      <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2 pointer-events-auto max-w-[75vw]">
+      <div className="flex gap-3 overflow-x-auto no-scrollbar pb-2 pointer-events-auto max-w-[85vw]">
         {rivals.map((player) => {
           const isFocused = focusedPlayerId === player.id;
           const isCurrentTurn = gameState.players[gameState.currentPlayerIndex].id === player.id;
-          const healthyOrgans = player.body.filter(o => o.medicines.length === 0 && o.viruses.length === 0).length;
           
+          // Map of organ colors for the dots
+          const colorClasses: Record<string, string> = {
+            red: 'bg-red-500',
+            blue: 'bg-blue-500',
+            yellow: 'bg-yellow-400',
+            green: 'bg-green-500', // for bone/default in this context
+            wildcard: 'bg-purple-500'
+          };
+
           return (
             <button
               key={player.id}
               onClick={() => setFocusedPlayerId(player.id)}
               className={cn(
-                "flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all shrink-0 shadow-lg backdrop-blur-md active:scale-95",
+                "flex flex-col items-center gap-1.5 px-4 py-2 rounded-2xl border transition-all shrink-0 shadow-xl backdrop-blur-xl active:scale-90",
                 isFocused 
-                  ? "bg-blue-600/40 border-blue-400 ring-2 ring-blue-400/50" 
+                  ? "bg-slate-800 border-blue-400 ring-2 ring-blue-400/30 scale-105" 
                   : isCurrentTurn 
-                    ? "bg-yellow-500/20 border-yellow-500/50" 
-                    : "bg-slate-900/90 border-white/10"
+                    ? "bg-yellow-500/10 border-yellow-500/40" 
+                    : "bg-slate-900/80 border-white/5"
               )}
             >
-              <div className="flex flex-col items-start">
-                <div className="flex items-center gap-1.5">
-                  <span className={cn(
-                    "text-[10px] font-black uppercase tracking-tight truncate max-w-[80px]",
-                    isFocused ? "text-white" : isCurrentTurn ? "text-yellow-400" : "text-white/60"
-                  )}>
-                    {player.name}
-                  </span>
-                  {isCurrentTurn && <div className="w-1.5 h-1.5 bg-yellow-400 rounded-full animate-pulse shadow-[0_0_5px_rgba(234,179,8,1)]" />}
-                </div>
-                
-                <div className="flex gap-0.5 mt-0.5">
-                  {player.body.map((organ, idx) => {
-                    const status = organ.isImmune ? 'immune' : 
-                                  organ.viruses.length > 0 ? 'virus' : 
-                                  organ.medicines.length > 0 ? 'protected' : 'healthy';
-                    
-                    return (
-                      <div 
-                        key={idx}
-                        className={cn(
-                          "w-2 h-2 rounded-full",
-                          status === 'immune' ? "bg-purple-500 shadow-[0_0_5px_rgba(168,85,247,0.5)]" :
-                          status === 'virus' ? "bg-red-500" :
-                          status === 'protected' ? "bg-blue-500" :
-                          "bg-green-500"
-                        )}
-                      />
-                    );
-                  })}
-                  {/* Empty slots placeholders */}
-                  {Array.from({ length: 4 - player.body.length }).map((_, i) => (
-                    <div key={`empty-${i}`} className="w-2 h-2 rounded-full border border-white/20 bg-transparent" />
-                  ))}
-                </div>
+              <span className={cn(
+                "text-[10px] font-black uppercase tracking-widest",
+                isFocused ? "text-blue-400" : isCurrentTurn ? "text-yellow-400" : "text-white/40"
+              )}>
+                {player.name}
+              </span>
+              
+              <div className="flex gap-1.5">
+                {[0, 1, 2, 3].map((idx) => {
+                  const organ = player.body[idx];
+                  if (!organ) return <div key={idx} className="w-2.5 h-2.5 rounded-full bg-white/5 border border-white/10" />;
+                  
+                  const baseColor = organ.organCard.color;
+                  const dotColor = colorClasses[baseColor] || 'bg-slate-500';
+                  
+                  return (
+                    <div 
+                      key={idx}
+                      className={cn(
+                        "w-2.5 h-2.5 rounded-full relative",
+                        dotColor,
+                        organ.isImmune && "ring-2 ring-white shadow-[0_0_8px_rgba(255,255,255,0.8)]",
+                        organ.viruses.length > 0 && "animate-pulse"
+                      )}
+                    >
+                      {organ.viruses.length > 0 && (
+                        <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-600 rounded-full border border-white/20" />
+                      )}
+                    </div>
+                  );
+                })}
               </div>
-
-              {healthyOrgans >= 4 && (
-                <CheckCircle2 size={14} className="text-yellow-500 animate-bounce" />
-              )}
             </button>
           );
         })}
