@@ -21,6 +21,7 @@ export const SocialDock: React.FC<SocialDockProps> = ({ onSendReaction, onSendMe
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('[SOCIAL] Emitting message:', text);
     if (text.trim() && !cooldown) {
       onSendMessage(text.trim());
       setText('');
@@ -30,6 +31,7 @@ export const SocialDock: React.FC<SocialDockProps> = ({ onSendReaction, onSendMe
   };
 
   const handleReaction = (id: string) => {
+    console.log('[SOCIAL] Emitting reaction:', id);
     if (!cooldown) {
       onSendReaction(id);
       setIsOpen(false);
