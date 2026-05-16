@@ -38,7 +38,7 @@ const PlayerBoardBase: React.FC<PlayerBoardProps> = ({
     <div 
       onClick={isTargetable ? () => onPlayerClick?.(player.id) : undefined}
       className={cn(
-      'rounded-[1.5rem] md:rounded-[2rem] transition-all border-[2px] md:border-[3px] flex flex-col relative overflow-hidden will-change-transform',
+      'rounded-[1.5rem] md:rounded-[2rem] transition-all border-[2px] md:border-[3px] flex flex-col relative will-change-transform',
       isActive ? 'bg-slate-800/95 border-yellow-500 shadow-[0_0_40px_rgba(234,179,8,0.2)]' : 'bg-slate-900/40 border-white/5 opacity-70 hover:opacity-100',
       compact ? 'p-2 md:p-3 w-full' : 'p-3 md:p-6 w-full shadow-2xl',
       isTargetable && 'cursor-pointer ring-4 ring-blue-500 ring-offset-4 ring-offset-slate-900 animate-pulse z-20'
