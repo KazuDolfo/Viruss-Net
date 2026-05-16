@@ -102,38 +102,27 @@ export const processAction = (roomId: string, playerId: string, action: GameActi
 
 export const handleDisconnect = (socketId: string) => {
     let affectedRoomId: string | null = null;
-    let winnerId: string | null = null;
 
     Object.keys(rooms).forEach(roomId => {
         const room = rooms[roomId];
-        const playerIndex = room.players.findIndex(p => p.socketId === socketId);
+        const player = room.players.find(p => p.socketId === socketId);
         
-        if (playerIndex !== -1) {
+        if (player) {
             affectedRoomId = roomId;
-            // Remove player from room list
-            room.players.splice(playerIndex, 1);
+            // Mark player as disconnected by clearing socketId
+            // but DO NOT remove them from the room to allow reconnection
+            player.socketId = '';
             
-            // If game is active and only 1 player remains, they win
-            if (room.status === 'playing' && room.players.length === 1) {
-                winnerId = room.players[0].id;
-                room.status = 'finished';
-                if (room.gameState) {
-                    room.gameState = {
-                        ...room.gameState,
-                        winnerId: winnerId
-                    };
-                }
-            }
-
-            // Cleanup empty rooms
-            if (room.players.length === 0) {
-                delete rooms[roomId];
-                affectedRoomId = null; // No need to notify
+            // If the room is now completely empty, we can clean it up
+            const activeConnections = room.players.filter(p => p.socketId !== '').length;
+            if (activeConnections === 0) {
+                // Keep the room for a while even if empty, but cleanupRooms will handle it
+                room.lastActivity = Date.now();
             }
         }
     });
 
-    return { roomId: affectedRoomId, winnerId };
+    return { roomId: affectedRoomId };
 };
 
 export const cleanupRooms = () => {

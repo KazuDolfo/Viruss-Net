@@ -156,12 +156,13 @@ io.on('connection', (socket: Socket) => {
                 players: room.players.map(p => ({ id: p.id, name: p.name })),
                 status: room.status 
             });
-
-            if (result.winnerId && room.gameState) {
-                const winner = room.players.find(p => p.id === result.winnerId);
-                io.to(result.roomId).emit('game_over', { winner: winner ? winner.name : 'Unknown' });
+            
+            // Notify other players if the game is active (they might want to know someone is offline)
+            if (room.gameState) {
                 room.players.forEach(p => {
-                    io.to(p.socketId).emit('game_update', sanitizeState(room.gameState, p.id));
+                    if (p.socketId) {
+                        io.to(p.socketId).emit('game_update', sanitizeState(room.gameState, p.id));
+                    }
                 });
             }
         }
