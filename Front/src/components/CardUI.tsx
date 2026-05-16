@@ -122,9 +122,9 @@ const CardUIBase: React.FC<CardUIProps> = ({ card, onClick, selected, disabled, 
   const theme = card.type === 'organ' ? organTheme[organKey as string] || organTheme.default : null;
   const Icon = theme?.icon || (card.type === 'virus' ? Skull : card.type === 'medicine' ? Shield : Zap);
 
-  const showImage = hasCustomImage && !small && imageStatus === 'loaded';
-  const showFallback = !hasCustomImage || small || imageStatus === 'error';
-  const isLoading = hasCustomImage && imageStatus === 'loading' && !small;
+  const showImage = hasCustomImage && imageStatus === 'loaded';
+  const showFallback = !hasCustomImage || imageStatus === 'error';
+  const isLoading = hasCustomImage && imageStatus === 'loading';
 
   return (
     <div
@@ -145,7 +145,7 @@ const CardUIBase: React.FC<CardUIProps> = ({ card, onClick, selected, disabled, 
       {isLoading && <CardSkeleton />}
 
       {/* REMOTE IMAGE (Hardware Accelerated) */}
-      {hasCustomImage && !small && (
+      {hasCustomImage && (
         <img 
           src={customUrl} 
           alt={card.name}
@@ -161,11 +161,17 @@ const CardUIBase: React.FC<CardUIProps> = ({ card, onClick, selected, disabled, 
 
       {/* OVERLAY LABEL & DESCRIPTION */}
       {showImage && (
-        <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/95 via-black/70 to-transparent z-20 flex flex-col items-center justify-end pb-3 md:pb-5 px-2 transition-all group-hover:h-2/3">
-          <span className="text-white font-black text-[10px] xs:text-[11px] md:text-sm tracking-tighter uppercase text-center leading-none mb-1 drop-shadow-md">
+        <div className={cn(
+          "absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent z-20 flex flex-col items-center justify-end px-2 transition-all",
+          small ? "h-1/3 pb-1.5" : "h-1/2 pb-3 md:pb-5 group-hover:h-2/3"
+        )}>
+          <span className={cn(
+            "text-white font-black tracking-tighter uppercase text-center leading-none drop-shadow-md",
+            small ? "text-[6px] md:text-[8px]" : "text-[10px] xs:text-[11px] md:text-sm mb-1"
+          )}>
             {card.name}
           </span>
-          {card.description && (
+          {card.description && !small && (
              <p className="text-[7px] md:text-[9px] text-white/80 font-medium text-center leading-tight line-clamp-2 md:line-clamp-3 italic">
                {card.description}
              </p>

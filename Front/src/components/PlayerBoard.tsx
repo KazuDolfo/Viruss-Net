@@ -83,7 +83,7 @@ const PlayerBoardBase: React.FC<PlayerBoardProps> = ({
                   onClick={() => onOrganClick(player.id, organ.id)}
                   canTarget={canTargetOrgan(player.id, organ.id)}
                   isSelected={pendingTargets.some(t => t.playerId === player.id && t.organId === organ.id)}
-                  small={compact || player.body.length > 4 || true} // Force true for better mobile layout
+                  small={compact || player.body.length > 4}
                 />
               ) : (
                 <div className="w-full h-full border-2 border-dashed border-white/10 rounded-lg md:rounded-xl flex items-center justify-center opacity-20">
