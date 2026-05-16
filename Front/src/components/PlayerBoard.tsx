@@ -2,6 +2,7 @@ import React, { memo } from 'react';
 import type { Player, Card } from '@shared/models';
 import { OrganSlot } from './OrganSlot';
 import { cn } from '../utils/cn';
+import { FloatingSocial } from './FloatingSocial';
 
 interface PlayerBoardProps {
   player: Player;

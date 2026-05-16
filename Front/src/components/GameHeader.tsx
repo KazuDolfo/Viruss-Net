@@ -1,15 +1,13 @@
 import React from 'react';
-import { ScrollText, Layers } from 'lucide-react';
-import { cn } from '../utils/cn'; // Assuming we create a small utility for this
+import { Layers } from 'lucide-react';
+import { cn } from '../utils/cn';
 
 interface GameHeaderProps {
   isMyTurn: boolean;
   isDrawingState: boolean;
   currentPlayerName: string;
   deckCount: number;
-  onShowLogs: () => void;
   onDrawCard: () => void;
-  showLogsActive: boolean;
   isConnected?: boolean;
 }
 
@@ -18,9 +16,7 @@ export const GameHeader: React.FC<GameHeaderProps> = ({
   isDrawingState,
   currentPlayerName,
   deckCount,
-  onShowLogs,
   onDrawCard,
-  showLogsActive,
   isConnected = true
 }) => {
   return (

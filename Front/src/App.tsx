@@ -33,7 +33,7 @@ const LoadingBar = () => {
 };
 
 const App: React.FC = () => {
-  useSocketSync(); 
+  const { isConnected } = useSocketSync(); 
   const gameState = useGameStore(state => state.gameState);
   const playerId = useGameStore(state => state.playerId);
   const roomPlayers = useGameStore(state => state.roomPlayers);
@@ -41,7 +41,6 @@ const App: React.FC = () => {
   const roomCode = useGameStore(state => state.roomCode);
   const setPlayerId = useGameStore(state => state.setPlayerId);
   const setRoomCode = useGameStore(state => state.setRoomCode);
-  const isConnected = useGameStore(state => state.isConnected);
 
   const { joinRoom, startGame, sendAction, leaveRoom } = useGameActions();
   const { 
@@ -180,8 +179,7 @@ const App: React.FC = () => {
         <GameHeader 
           isMyTurn={isMyTurn} isDrawingState={isDrawingState}
           currentPlayerName={currentPlayer.name} deckCount={gameState.deck.length}
-          onShowLogs={() => {}} onDrawCard={handleDrawCard}
-          showLogsActive={false}
+          onDrawCard={handleDrawCard}
           isConnected={isConnected}
         />
         <PlayerHand 
