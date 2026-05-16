@@ -66,8 +66,8 @@ export const GameTable: React.FC<GameTableProps> = ({
         </div>
 
         {/* Local Player Stage (Always highlighted in its own area) */}
-        <div className="md:col-span-3 mt-2 md:mt-4 flex justify-center order-2">
-          <div className="w-full max-w-2xl transform hover:scale-[1.01] transition-transform duration-500">
+        <div className="md:col-span-3 mt-4 md:mt-12 flex justify-center order-2">
+          <div className="w-full max-w-2xl lg:max-w-6xl transform hover:scale-[1.01] transition-transform duration-500">
             <PlayerBoard 
               player={myPlayer} 
               isActive={isMyTurn && !isDrawingState} 
