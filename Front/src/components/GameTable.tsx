@@ -45,10 +45,10 @@ export const GameTable: React.FC<GameTableProps> = ({
         "grid-cols-1 md:grid-cols-3 items-start justify-center max-w-7xl mx-auto"
       )}>
         
-        {/* Rivals Area */}
-        <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 gap-4 md:col-span-3 order-1">
+        {/* Rivals Area - Horizontal Scroll on Mobile, Grid on Desktop */}
+        <div className="flex flex-nowrap overflow-x-auto snap-x gap-4 md:grid md:grid-cols-3 md:gap-4 md:col-span-3 order-1 pb-4 md:pb-0 scroll-smooth no-scrollbar">
           {rivals.map((p) => (
-            <div key={p.id} className="w-full transform hover:scale-[1.01] transition-transform duration-500">
+            <div key={p.id} className="w-[85vw] shrink-0 snap-center md:w-auto transform hover:scale-[1.01] transition-transform duration-500">
               <PlayerBoard 
                 player={p} 
                 isActive={p.id === currentPlayer.id} 

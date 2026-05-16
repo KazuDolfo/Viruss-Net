@@ -29,14 +29,14 @@ export const ActionOverlay: React.FC<ActionOverlayProps> = ({
 
   return (
     <div className={cn(
-      "fixed inset-x-0 bottom-[calc(var(--hand-height,160px)+0.5rem)] md:bottom-[calc(var(--hand-height,180px)+1rem)] z-50 p-2 md:p-4 pb-4 transition-transform duration-500 ease-out pointer-events-none",
+      "fixed inset-x-0 bottom-[calc(var(--hand-height,140px)+0.25rem)] md:bottom-[calc(var(--hand-height,180px)+1rem)] z-50 p-2 md:p-4 pb-4 transition-transform duration-500 ease-out pointer-events-none",
       isVisible ? "translate-y-0" : "translate-y-[250%]"
     )}>
       <div className="max-w-xl md:max-w-4xl mx-auto pointer-events-auto">
         {selectedCards.length === 1 && (
-          <div className="bg-slate-900/95 backdrop-blur-2xl p-4 md:p-6 rounded-[2rem] md:rounded-[2.5rem] border-[2px] md:border-[3px] border-white/10 shadow-[0_-20px_60px_rgba(0,0,0,0.6)] animate-in slide-in-from-bottom-10">
-            <div className="flex flex-row md:flex-row gap-4 md:gap-6 items-center">
-              <div className="shrink-0 w-20 xs:w-24 md:w-32">
+          <div className="bg-slate-900/95 backdrop-blur-2xl p-3 md:p-6 rounded-[1.5rem] md:rounded-[2.5rem] border-[2px] md:border-[3px] border-white/10 shadow-[0_-20px_60px_rgba(0,0,0,0.6)] animate-in slide-in-from-bottom-10">
+            <div className="flex flex-row md:flex-row gap-3 md:gap-6 items-center">
+              <div className="shrink-0 w-16 xs:w-20 md:w-32">
                 <CardUI card={selectedCards[0]} />
               </div>
               <div className="flex-1 min-w-0">
