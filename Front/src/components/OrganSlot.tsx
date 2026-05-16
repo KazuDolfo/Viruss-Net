@@ -74,12 +74,6 @@ const OrganSlotBase: React.FC<OrganSlotProps> = ({ organ, onClick, canTarget, is
           <ShieldCheck size={small ? 32 : 56} className="text-blue-100 drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]" />
         </div>
       )}
-      
-      {canTarget && !isSelected && (
-        <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-yellow-400 text-black text-[9px] md:text-[11px] font-black px-3 py-1 rounded-full shadow-2xl z-40 whitespace-nowrap border-2 border-black/10">
-          ¡ELIGE AQUÍ!
-        </div>
-      )}
 
       {isSelected && (
         <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-green-500 text-white text-[9px] md:text-[11px] font-black px-3 py-1 rounded-full shadow-2xl z-40 whitespace-nowrap border-2 border-white/20">

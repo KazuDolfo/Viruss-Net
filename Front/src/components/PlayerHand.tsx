@@ -21,7 +21,7 @@ export const PlayerHand: React.FC<PlayerHandProps> = ({
 }) => {
   return (
     <div className={cn(
-      "fixed bottom-0 left-0 right-0 z-40 transition-all duration-700 ease-in-out px-2 pb-[env(safe-area-inset-bottom,1.5rem)] md:pb-8 pt-10",
+      "fixed bottom-0 left-0 right-0 z-40 transition-all duration-700 ease-in-out px-2 pb-2 md:pb-4 pt-4",
       isMyTurn ? "translate-y-0" : "translate-y-[85%] opacity-60 hover:translate-y-0 hover:opacity-100"
     )}>
       {/* GLOW BACKGROUND EFFECT */}
