@@ -11,18 +11,21 @@ export const PlayerStatusPanel: React.FC = () => {
 
   if (!gameState) return null;
 
-  // Initialize focus to first player if none is focused
+  const rivals = React.useMemo(() => {
+    return gameState.players.filter(p => p.id !== myPlayerId);
+  }, [gameState.players, myPlayerId]);
+
+  // Initialize focus to first rival if none is focused
   React.useEffect(() => {
-    if (!focusedPlayerId && gameState.players.length > 0) {
-      setFocusedPlayerId(myPlayerId || gameState.players[0].id);
+    if (!focusedPlayerId && rivals.length > 0) {
+      setFocusedPlayerId(rivals[0].id);
     }
-  }, [focusedPlayerId, gameState.players, myPlayerId, setFocusedPlayerId]);
+  }, [focusedPlayerId, rivals, setFocusedPlayerId]);
 
   return (
     <div className="fixed top-[calc(var(--safe-top)+0.5rem)] left-0 right-0 z-30 px-3 flex justify-end md:hidden pointer-events-none">
       <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2 pointer-events-auto max-w-[75vw]">
-        {gameState.players.map((player) => {
-          const isMe = player.id === myPlayerId;
+        {rivals.map((player) => {
           const isFocused = focusedPlayerId === player.id;
           const isCurrentTurn = gameState.players[gameState.currentPlayerIndex].id === player.id;
           const healthyOrgans = player.body.filter(o => o.medicines.length === 0 && o.viruses.length === 0).length;
@@ -46,7 +49,7 @@ export const PlayerStatusPanel: React.FC = () => {
                     "text-[10px] font-black uppercase tracking-tight truncate max-w-[80px]",
                     isFocused ? "text-white" : isCurrentTurn ? "text-yellow-400" : "text-white/60"
                   )}>
-                    {isMe ? "TÚ" : player.name}
+                    {player.name}
                   </span>
                   {isCurrentTurn && <div className="w-1.5 h-1.5 bg-yellow-400 rounded-full animate-pulse shadow-[0_0_5px_rgba(234,179,8,1)]" />}
                 </div>
