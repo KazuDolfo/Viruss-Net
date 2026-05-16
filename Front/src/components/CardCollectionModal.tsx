@@ -85,12 +85,16 @@ export const CardCollectionModal: React.FC<CardCollectionModalProps> = ({ isOpen
   };
 
   const testReaction = (id: string) => {
+    console.log('[TEST_REACTION] Attempting to test:', id, 'PlayerID:', playerId);
     if (playerId) {
+      console.log('[TEST_REACTION] Adding event to store...');
       addSocialEvent({
         playerId,
         reactionId: id,
         timestamp: Date.now()
       });
+    } else {
+      console.warn('[TEST_REACTION] Failed: No PlayerID found in store');
     }
   };
 
