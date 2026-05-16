@@ -1,7 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { SocialEvent, REACTIONS } from '@shared/index';
 import { useGameStore } from '../store/gameStore';
-import { cn } from '../utils/cn';
 
 interface FloatingSocialProps {
   playerId: string;
@@ -13,7 +12,7 @@ export const FloatingSocial: React.FC<FloatingSocialProps> = ({ playerId }) => {
   const removeEvent = useGameStore(state => state.removeSocialEvent);
 
   useEffect(() => {
-    playerEvents.forEach(event => {
+    playerEvents.forEach((event: SocialEvent) => {
       const timer = setTimeout(() => {
         removeEvent(event.timestamp);
       }, 4000); // 4 seconds life
@@ -23,7 +22,7 @@ export const FloatingSocial: React.FC<FloatingSocialProps> = ({ playerId }) => {
 
   return (
     <div className="absolute inset-0 pointer-events-none z-50 flex items-center justify-center overflow-visible">
-      {playerEvents.map((event) => {
+      {playerEvents.map((event: SocialEvent) => {
         const reaction = REACTIONS.find(r => r.id === event.reactionId);
         
         return (
