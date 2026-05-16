@@ -186,8 +186,7 @@ const App: React.FC = () => {
       <div className="layer-hud inset-0">
         <GameHeader 
           isMyTurn={isMyTurn} isDrawingState={isDrawingState}
-          currentPlayerName={currentPlayer.name} deckCount={gameState.deck.length}
-          onDrawCard={handleDrawCard}
+          currentPlayerName={currentPlayer.name} 
           onLeave={leaveRoom}
           isConnected={isConnected}
         />

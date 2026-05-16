@@ -1,13 +1,11 @@
 import React from 'react';
-import { Layers, Zap } from 'lucide-react';
+import { Zap } from 'lucide-react';
 import { cn } from '../utils/cn';
 
 interface GameHeaderProps {
   isMyTurn: boolean;
   isDrawingState: boolean;
   currentPlayerName: string;
-  deckCount: number;
-  onDrawCard: () => void;
   onLeave: () => void;
   isConnected?: boolean;
 }
@@ -16,8 +14,6 @@ export const GameHeader: React.FC<GameHeaderProps> = ({
   isMyTurn,
   isDrawingState,
   currentPlayerName,
-  deckCount,
-  onDrawCard,
   onLeave,
   isConnected = true
 }) => {
