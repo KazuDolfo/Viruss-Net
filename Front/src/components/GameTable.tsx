@@ -75,6 +75,37 @@ export const GameTable: React.FC<GameTableProps> = ({
           ))}
         </div>
 
+        {/* Table Centerpiece - Turn Indicator */}
+        <div className="flex justify-center items-center py-2 md:py-4">
+          <div className={cn(
+            "px-6 py-2 md:px-10 md:py-4 rounded-[2rem] border-2 backdrop-blur-2xl transition-all duration-700 shadow-2xl flex flex-col items-center",
+            isMyTurn 
+              ? "bg-yellow-500/10 border-yellow-500/40 shadow-yellow-500/5 scale-110" 
+              : "bg-slate-900/40 border-white/5 opacity-80"
+          )}>
+            <div className="flex items-center gap-3">
+              {isMyTurn && <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse shadow-[0_0_10px_rgba(234,179,8,1)]" />}
+              <span className={cn(
+                "text-[9px] md:text-xs font-black uppercase tracking-[0.3em] leading-none",
+                isMyTurn ? "text-yellow-500" : "text-slate-500"
+              )}>
+                {isMyTurn ? (isDrawingState ? "TU ROBO" : "TU TURNO") : `TURNO DE`}
+              </span>
+              {isMyTurn && <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse shadow-[0_0_10px_rgba(234,179,8,1)]" />}
+            </div>
+            {!isMyTurn && (
+              <span className="text-xl md:text-4xl font-black uppercase italic tracking-tighter text-white mt-1">
+                {currentPlayer.name}
+              </span>
+            )}
+            {isMyTurn && (
+               <span className="text-xl md:text-4xl font-black uppercase italic tracking-tighter text-yellow-400 mt-1 animate-pulse">
+                ¡TE TOCA!
+              </span>
+            )}
+          </div>
+        </div>
+
         {/* Local Player Stage (Always highlighted in its own area) */}
         <div id={`player-board-${myPlayer.id}`} className="w-full flex justify-center mt-2 md:mt-4">
           <div className="w-full max-w-3xl transform hover:scale-[1.01] transition-transform duration-500">
