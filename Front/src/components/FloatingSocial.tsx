@@ -12,12 +12,13 @@ export const FloatingSocial: React.FC<FloatingSocialProps> = ({ playerId }) => {
   const removeEvent = useGameStore(state => state.removeSocialEvent);
 
   useEffect(() => {
-    playerEvents.forEach((event: SocialEvent) => {
-      const timer = setTimeout(() => {
+    const timers = playerEvents.map(event => {
+      return setTimeout(() => {
         removeEvent(event.timestamp);
-      }, 4000); // 4 seconds life
-      return () => clearTimeout(timer);
+      }, 4000);
     });
+    
+    return () => timers.forEach(clearTimeout);
   }, [playerEvents, removeEvent]);
 
   return (

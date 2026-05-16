@@ -180,6 +180,7 @@ const App: React.FC = () => {
           isMyTurn={isMyTurn} isDrawingState={isDrawingState}
           currentPlayerName={currentPlayer.name} deckCount={gameState.deck.length}
           onDrawCard={handleDrawCard}
+          onLeave={leaveRoom}
           isConnected={isConnected}
         />
         <PlayerHand 
