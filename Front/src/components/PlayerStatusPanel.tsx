@@ -1,49 +1,50 @@
 import React from 'react';
 import { useGameStore } from '../store/gameStore';
 import { cn } from '../utils/cn';
-import { Heart, Shield, Skull, CheckCircle2 } from 'lucide-react';
+import { CheckCircle2 } from 'lucide-react';
 
 export const PlayerStatusPanel: React.FC = () => {
   const gameState = useGameStore(state => state.gameState);
   const myPlayerId = useGameStore(state => state.playerId);
+  const focusedPlayerId = useGameStore(state => state.focusedPlayerId);
+  const setFocusedPlayerId = useGameStore(state => state.setFocusedPlayerId);
 
   if (!gameState) return null;
 
-  const scrollToPlayer = (playerId: string) => {
-    const element = document.getElementById(`player-board-${playerId}`);
-    if (element) {
-      // scrollIntoView with 'start' block is more reliable on mobile to bring the element to the top
-      element.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'center' });
-      
-      // Since we have a floating HUD, we might need a tiny bit of extra scroll
-      // but 'start' usually handles the nearest scrollable container correctly.
+  // Initialize focus to first player if none is focused
+  React.useEffect(() => {
+    if (!focusedPlayerId && gameState.players.length > 0) {
+      setFocusedPlayerId(myPlayerId || gameState.players[0].id);
     }
-  };
+  }, [focusedPlayerId, gameState.players, myPlayerId, setFocusedPlayerId]);
 
   return (
     <div className="fixed top-[calc(var(--safe-top)+0.5rem)] left-0 right-0 z-30 px-3 flex justify-end md:hidden pointer-events-none">
       <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2 pointer-events-auto max-w-[75vw]">
         {gameState.players.map((player) => {
           const isMe = player.id === myPlayerId;
+          const isFocused = focusedPlayerId === player.id;
           const isCurrentTurn = gameState.players[gameState.currentPlayerIndex].id === player.id;
           const healthyOrgans = player.body.filter(o => o.medicines.length === 0 && o.viruses.length === 0).length;
           
           return (
             <button
               key={player.id}
-              onClick={() => scrollToPlayer(player.id)}
+              onClick={() => setFocusedPlayerId(player.id)}
               className={cn(
                 "flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all shrink-0 shadow-lg backdrop-blur-md active:scale-95",
-                isCurrentTurn 
-                  ? "bg-yellow-500/30 border-yellow-500 shadow-yellow-500/20" 
-                  : "bg-slate-900/90 border-white/10"
+                isFocused 
+                  ? "bg-blue-600/40 border-blue-400 ring-2 ring-blue-400/50" 
+                  : isCurrentTurn 
+                    ? "bg-yellow-500/20 border-yellow-500/50" 
+                    : "bg-slate-900/90 border-white/10"
               )}
             >
               <div className="flex flex-col items-start">
                 <div className="flex items-center gap-1.5">
                   <span className={cn(
                     "text-[10px] font-black uppercase tracking-tight truncate max-w-[80px]",
-                    isCurrentTurn ? "text-yellow-400" : "text-white/80"
+                    isFocused ? "text-white" : isCurrentTurn ? "text-yellow-400" : "text-white/60"
                   )}>
                     {isMe ? "TÚ" : player.name}
                   </span>

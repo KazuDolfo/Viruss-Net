@@ -9,6 +9,7 @@ interface GameStore {
   roomStatus: 'waiting' | 'playing' | 'finished';
   isDrawingState: boolean;
   isConnected: boolean;
+  focusedPlayerId: string | null;
   
   // Social State
   activeSocialEvents: SocialEvent[];
@@ -23,6 +24,7 @@ interface GameStore {
   setRoomCode: (code: string | null) => void;
   setIsDrawingState: (isDrawing: boolean) => void;
   setIsConnected: (connected: boolean) => void;
+  setFocusedPlayerId: (id: string | null) => void;
   resetStore: () => void;
 }
 
@@ -34,6 +36,7 @@ export const useGameStore = create<GameStore>((set) => ({
   roomStatus: 'waiting',
   isDrawingState: false,
   isConnected: false,
+  focusedPlayerId: null,
   activeSocialEvents: [],
 
   addSocialEvent: (event) => set((state) => ({ 
@@ -51,6 +54,7 @@ export const useGameStore = create<GameStore>((set) => ({
   setRoomCode: (roomCode) => set({ roomCode }),
   setIsDrawingState: (isDrawingState) => set({ isDrawingState }),
   setIsConnected: (isConnected) => set({ isConnected }),
+  setFocusedPlayerId: (focusedPlayerId) => set({ focusedPlayerId }),
   
   resetStore: () => set({ 
     gameState: null, 
@@ -59,6 +63,7 @@ export const useGameStore = create<GameStore>((set) => ({
     roomStatus: 'waiting',
     isDrawingState: false,
     isConnected: false,
+    focusedPlayerId: null,
     activeSocialEvents: []
   }),
 }));
