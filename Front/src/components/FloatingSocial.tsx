@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 import { SocialEvent, REACTIONS } from '@shared/reactions';
 import { useGameStore } from '../store/gameStore';
+import { cn } from '../utils/cn';
 
 interface FloatingSocialProps {
   playerId: string;
