@@ -22,11 +22,11 @@
   --z-overlay: 50;
   --z-modal: 100;
 
-  --card-w-base: clamp(95px, 15vw, 215px);
-  --card-w-small: clamp(52px, 8vw, 110px);
+  --card-w-base: clamp(105px, 18vw, 215px);
+  --card-w-small: clamp(65px, 10vw, 125px);
   --card-aspect: 2/3;
   
-  --hand-height: clamp(130px, 22vh, 180px);
+  --hand-height: clamp(140px, 24vh, 190px);
   --board-stable-height: 100px;
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 16px);

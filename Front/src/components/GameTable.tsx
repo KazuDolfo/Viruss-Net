@@ -106,11 +106,10 @@ export const GameTable: React.FC<GameTableProps> = ({
               canTargetOrgan={canTargetOrgan}
               onPlayerClick={handlePlayerTarget}
               canTargetPlayer={canTargetPlayer}
-              compact={window.innerWidth < 768}
+              compact={false}
               isGameWinner={gameState.winnerId === p.id}
             />
-          </div>
-        ))}
+          </div>        ))}
       </div>
 
       {/* 2. TABLE CENTERPIECE (Turn Indicator) */}
