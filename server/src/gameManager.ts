@@ -117,7 +117,12 @@ export const handleDisconnect = (socketId: string) => {
             if (room.status === 'playing' && room.players.length === 1) {
                 winnerId = room.players[0].id;
                 room.status = 'finished';
-                if (room.gameState) room.gameState.winnerId = winnerId;
+                if (room.gameState) {
+                    room.gameState = {
+                        ...room.gameState,
+                        winnerId: winnerId
+                    };
+                }
             }
 
             // Cleanup empty rooms
