@@ -1,5 +1,5 @@
 import React from 'react';
-import { Layers } from 'lucide-react';
+import { Layers, Zap } from 'lucide-react';
 import { cn } from '../utils/cn';
 
 interface GameHeaderProps {
