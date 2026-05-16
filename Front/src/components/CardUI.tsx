@@ -130,9 +130,9 @@ const CardUIBase: React.FC<CardUIProps> = ({ card, onClick, selected, disabled, 
     <div
       onClick={!disabled ? onClick : undefined}
       className={cn(
-        'relative flex flex-col items-center justify-between rounded-[0.75rem] md:rounded-[1rem] border-[2px] md:border-[3px] p-1.5 md:p-2 transition-all cursor-pointer shadow-xl select-none touch-manipulation overflow-hidden group bg-gradient-to-b will-change-transform',
+        'relative flex flex-col items-center justify-between rounded-[0.75rem] md:rounded-[1rem] border-[2px] md:border-[3px] p-1.5 md:p-2 transition-all cursor-pointer shadow-xl select-none touch-manipulation overflow-hidden group bg-gradient-to-b will-change-transform aspect-[2/3] w-full',
         colorMap[card.color],
-        small ? 'w-14 h-20 md:w-16 md:h-24' : 'w-[100px] h-[150px] xs:w-[120px] xs:h-[180px] md:w-[160px] md:h-[240px]',
+        small ? 'max-w-[70px] md:max-w-[90px]' : 'max-w-[120px] xs:max-w-[140px] md:max-w-[180px]',
         selected ? 'ring-4 ring-white -translate-y-4 scale-105 z-20 shadow-[0_0_30px_rgba(255,255,255,0.4)]' : 'hover:-translate-y-2 hover:scale-[1.02]',
         disabled && 'opacity-40 grayscale cursor-not-allowed',
         className

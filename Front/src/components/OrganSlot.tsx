@@ -42,8 +42,8 @@ const OrganSlotBase: React.FC<OrganSlotProps> = ({ organ, onClick, canTarget, is
             card={v} 
             small 
             className={cn(
-                "shadow-lg border-white/40 ring-1 ring-black/20", 
-                i > 0 && "-mt-14 md:-mt-16"
+                "shadow-lg border-white/40 ring-1 ring-black/20 transition-all", 
+                i > 0 && "-mt-[70%] md:-mt-[80%]"
             )} 
           />
         ))}
@@ -60,8 +60,8 @@ const OrganSlotBase: React.FC<OrganSlotProps> = ({ organ, onClick, canTarget, is
             card={m} 
             small 
             className={cn(
-                "shadow-lg border-white/40 ring-1 ring-black/20", 
-                i > 0 && "-mt-14 md:-mt-16"
+                "shadow-lg border-white/40 ring-1 ring-black/20 transition-all", 
+                i > 0 && "-mt-[70%] md:-mt-[80%]"
             )} 
           />
         ))}
@@ -69,9 +69,9 @@ const OrganSlotBase: React.FC<OrganSlotProps> = ({ organ, onClick, canTarget, is
 
       {/* Immune indicator */}
       {organ.isImmune && (
-        <div className="absolute inset-0 flex items-center justify-center bg-blue-500/30 rounded-xl pointer-events-none border-4 border-blue-400 z-30 overflow-hidden">
+        <div className="absolute inset-0 flex items-center justify-center bg-blue-500/30 rounded-xl pointer-events-none border-[3px] md:border-4 border-blue-400 z-30 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent animate-[shimmer_2s_infinite]" />
-          <ShieldCheck size={small ? 32 : 56} className="text-blue-100 drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]" />
+          <ShieldCheck className="w-1/2 h-1/2 text-blue-100 drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]" />
         </div>
       )}
 
