@@ -23,7 +23,7 @@ export const FloatingSocial: React.FC<FloatingSocialProps> = ({ playerId }) => {
   return (
     <div className="absolute inset-0 pointer-events-none z-50 flex items-center justify-center overflow-visible">
       {playerEvents.map((event: SocialEvent) => {
-        const reaction = REACTIONS.find(r => r.id === event.reactionId);
+        const reaction = (REACTIONS || []).find(r => r.id === event.reactionId);
         
         return (
           <div 

@@ -27,7 +27,7 @@ export const SocialDock: React.FC<SocialDockProps> = ({ onSendReaction, onSendMe
       {/* Reaction Panel */}
       {isOpen && (
         <div className="bg-slate-900/90 backdrop-blur-2xl p-2 rounded-2xl border border-white/10 shadow-2xl flex flex-col gap-2 animate-in fade-in slide-in-from-bottom-4 duration-300">
-          {REACTIONS.map((r) => (
+          {(REACTIONS || []).map((r) => (
             <button
               key={r.id}
               onClick={() => { onSendReaction(r.id); setIsOpen(false); }}
@@ -61,20 +61,20 @@ export const SocialDock: React.FC<SocialDockProps> = ({ onSendReaction, onSendMe
       {/* Action Buttons */}
       <div className="flex gap-2">
         <button 
-          onClick={() => { setShowChat(!showChat); setIsOpen(false); }}
+          onClick={() => { setIsOpen(!isOpen); setShowChat(false); }}
           className={cn(
             "w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center transition-all shadow-xl border-2",
-            showChat ? "bg-blue-600 border-white text-white" : "bg-slate-800/80 border-white/10 text-white/60 hover:bg-slate-700"
+            isOpen ? "bg-yellow-500 border-white text-black" : "bg-slate-800/80 border-white/10 text-white/60 hover:bg-slate-700"
           )}
         >
           <Smile size={24} />
         </button>
         
         <button 
-          onClick={() => { setIsOpen(!isOpen); setShowChat(false); }}
+          onClick={() => { setShowChat(!showChat); setIsOpen(false); }}
           className={cn(
             "w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center transition-all shadow-xl border-2",
-            isOpen ? "bg-yellow-500 border-white text-black" : "bg-slate-800/80 border-white/10 text-white/60 hover:bg-slate-700"
+            showChat ? "bg-blue-600 border-white text-white" : "bg-slate-800/80 border-white/10 text-white/60 hover:bg-slate-700"
           )}
         >
           <span className="text-xl md:text-2xl">⚡</span>
