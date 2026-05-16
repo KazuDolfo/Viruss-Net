@@ -7,15 +7,21 @@ export interface Reaction {
 
 export const REACTIONS: Reaction[] = [
   { id: 'laugh', type: 'emoji', value: '😂', animation: 'burst' },
+  { id: 'love', type: 'emoji', value: '❤️', animation: 'burst' },
+  { id: 'cool', type: 'emoji', value: '😎', animation: 'spin' },
   { id: 'angry', type: 'emoji', value: '😠', animation: 'shake' },
   { id: 'surprised', type: 'emoji', value: '😮', animation: 'burst' },
-  { id: 'love', type: 'emoji', value: '❤️', animation: 'burst' },
   { id: 'sick', type: 'emoji', value: '🤮', animation: 'slide' },
-  { id: 'cool', type: 'emoji', value: '😎', animation: 'spin' },
   { id: 'thinking', type: 'emoji', value: '🤔', animation: 'slide' },
   { id: 'mindblown', type: 'emoji', value: '🤯', animation: 'burst' },
   { id: 'cry', type: 'emoji', value: '😭', animation: 'shake' },
-  { id: 'fire', type: 'emoji', value: '🔥', animation: 'burst' }
+  { id: 'fire', type: 'emoji', value: '🔥', animation: 'burst' },
+  { id: 'eyes', type: 'emoji', value: '👀', animation: 'slide' },
+  { id: 'party', type: 'emoji', value: '🥳', animation: 'spin' },
+  { id: 'scared', type: 'emoji', value: '😱', animation: 'shake' },
+  { id: 'sleep', type: 'emoji', value: '😴', animation: 'slide' },
+  { id: 'devil', type: 'emoji', value: '😈', animation: 'burst' },
+  { id: 'clown', type: 'emoji', value: '🤡', animation: 'spin' }
 ];
 
 export interface SocialEvent {
