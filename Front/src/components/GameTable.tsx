@@ -40,86 +40,59 @@ export const GameTable: React.FC<GameTableProps> = ({
 }) => {
   const rivalsCount = rivals.length;
   const focusedPlayerId = useGameStore(state => state.focusedPlayerId);
+  const setFocusedPlayerId = useGameStore(state => state.setFocusedPlayerId);
+
+  // Sync focused player when scrolling horizontally on mobile
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    if (window.innerWidth >= 768) return;
+    const container = e.currentTarget;
+    const scrollLeft = container.scrollLeft;
+    const itemWidth = container.offsetWidth * 0.92; // matching w-[92vw]
+    const index = Math.round(scrollLeft / (itemWidth + 16)); // +16 for gap
+    if (rivals[index] && rivals[index].id !== focusedPlayerId) {
+      setFocusedPlayerId(rivals[index].id);
+    }
+  };
 
   return (
-    <main className="flex-1 relative overflow-y-auto lg:overflow-hidden px-3 md:px-8 pt-[30px] md:pt-12 pb-[250px] lg:pb-8 no-scrollbar layer-world flex flex-col items-center">
-      {/* 1. MOBILE FOCUS VIEW (Single Rival Board) */}
-      <div className="md:hidden w-full max-w-lg animate-in fade-in zoom-in-95 duration-500 mt-12">
-        {rivals.map((p) => (
-          p.id === focusedPlayerId && (
-            <div key={p.id} className="w-full">
-              <PlayerBoard 
-                player={p} 
-                isActive={p.id === currentPlayer.id} 
-                selectedCards={selectedCards} 
-                pendingTargets={pendingTargets}
-                onCardClick={handleCardClick} 
-                onOrganClick={handleOrganClick} 
-                canTargetOrgan={canTargetOrgan}
-                onPlayerClick={handlePlayerTarget}
-                canTargetPlayer={canTargetPlayer}
-                compact={false}
-                isGameWinner={gameState.winnerId === p.id}
-              />
-            </div>
-          )
-        ))}
-        {/* Local player board is HIDDEN on mobile as per request */}
-      </div>
-
-      {/* 2. DESKTOP GRID VIEW (Both Rivals and Local) */}
-      <div className={cn(
-        "hidden md:flex w-full max-w-7xl flex-col gap-8 transition-all duration-500",
-      )}>
-        {/* Rivals Area */}
-        <div className={cn(
-          "md:grid md:overflow-visible md:gap-6",
+    <main className="flex-1 relative overflow-y-auto lg:overflow-hidden px-3 md:px-8 pt-[30px] md:pt-12 pb-[280px] lg:pb-8 no-scrollbar layer-world flex flex-col items-center">
+      
+      {/* 1. RIVALS AREA (Carousel on Mobile, Grid on Desktop) */}
+      <div 
+        onScroll={handleScroll}
+        className={cn(
+          "w-full max-w-7xl flex flex-nowrap overflow-x-auto snap-x snap-mandatory gap-4 pb-4 no-scrollbar transition-all duration-500",
+          "md:grid md:overflow-visible md:gap-8 md:pb-0",
           rivalsCount <= 2 ? "md:grid-cols-2" : 
           rivalsCount <= 3 ? "md:grid-cols-3" : 
           "md:grid-cols-3 lg:grid-cols-5"
-        )}>
-          {rivals.map((p) => (
-            <div 
-              key={p.id} 
-              className="md:w-auto shrink-0 transform hover:scale-[1.01] transition-transform duration-500"
-            >
-              <PlayerBoard 
-                player={p} 
-                isActive={p.id === currentPlayer.id} 
-                selectedCards={selectedCards} 
-                pendingTargets={pendingTargets}
-                onCardClick={handleCardClick} 
-                onOrganClick={handleOrganClick} 
-                canTargetOrgan={canTargetOrgan}
-                onPlayerClick={handlePlayerTarget}
-                canTargetPlayer={canTargetPlayer}
-                compact
-              />
-            </div>
-          ))}
-        </div>
-
-        {/* Local Player Stage (Desktop only, always visible at bottom) */}
-        <div className="w-full flex justify-center mt-4">
-          <div className="w-full max-w-3xl transform hover:scale-[1.01] transition-transform duration-500">
+        )}
+      >
+        {rivals.map((p) => (
+          <div 
+            key={p.id} 
+            id={`player-board-${p.id}`}
+            className="w-[92vw] md:w-auto shrink-0 snap-center transform hover:scale-[1.01] transition-transform duration-500"
+          >
             <PlayerBoard 
-              player={myPlayer} 
-              isActive={isMyTurn && !isDrawingState} 
+              player={p} 
+              isActive={p.id === currentPlayer.id} 
               selectedCards={selectedCards} 
               pendingTargets={pendingTargets}
               onCardClick={handleCardClick} 
               onOrganClick={handleOrganClick} 
               canTargetOrgan={canTargetOrgan}
               onPlayerClick={handlePlayerTarget}
-              canTargetPlayer={neverTargetPlayer}
-              isGameWinner={gameState.winnerId === myPlayer.id}
+              canTargetPlayer={canTargetPlayer}
+              compact={window.innerWidth < 768} // Compact only on small screens
+              isGameWinner={gameState.winnerId === p.id}
             />
           </div>
-        </div>
+        ))}
       </div>
 
-      {/* Turn Indicator (Visible on both, but styled for center) */}
-      <div className="flex justify-center items-center py-4 md:py-6 order-first md:order-none">
+      {/* 2. TABLE CENTERPIECE (Turn Indicator) */}
+      <div className="flex justify-center items-center py-4 md:py-8 order-first md:order-none">
         <div className={cn(
           "px-6 py-2 md:px-10 md:py-4 rounded-[2rem] border-2 backdrop-blur-2xl transition-all duration-700 shadow-2xl flex flex-col items-center",
           isMyTurn 
@@ -146,6 +119,24 @@ export const GameTable: React.FC<GameTableProps> = ({
               ¡TE TOCA!
             </span>
           )}
+        </div>
+      </div>
+
+      {/* 3. LOCAL PLAYER STAGE (Always visible at bottom) */}
+      <div id={`player-board-${myPlayer.id}`} className="w-full flex justify-center mt-4 md:mt-8 pb-12">
+        <div className="w-full max-w-3xl transform hover:scale-[1.01] transition-transform duration-500">
+          <PlayerBoard 
+            player={myPlayer} 
+            isActive={isMyTurn && !isDrawingState} 
+            selectedCards={selectedCards} 
+            pendingTargets={pendingTargets}
+            onCardClick={handleCardClick} 
+            onOrganClick={handleOrganClick} 
+            canTargetOrgan={canTargetOrgan}
+            onPlayerClick={handlePlayerTarget}
+            canTargetPlayer={neverTargetPlayer}
+            isGameWinner={gameState.winnerId === myPlayer.id}
+          />
         </div>
       </div>
 

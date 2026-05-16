@@ -23,8 +23,8 @@ export const PlayerStatusPanel: React.FC = () => {
   }, [focusedPlayerId, rivals, setFocusedPlayerId]);
 
   return (
-    <div className="fixed top-[calc(var(--safe-top)+0.5rem)] left-0 right-0 z-30 px-3 flex justify-end md:hidden pointer-events-none">
-      <div className="flex gap-3 overflow-x-auto no-scrollbar pb-2 pointer-events-auto max-w-[85vw]">
+    <div className="fixed top-[calc(var(--safe-top)+0.5rem)] left-0 right-0 z-50 px-3 flex justify-end">
+      <div className="flex gap-3 overflow-x-auto no-scrollbar pb-2 max-w-[85vw]">
         {rivals.map((player) => {
           const isFocused = focusedPlayerId === player.id;
           const isCurrentTurn = gameState.players[gameState.currentPlayerIndex].id === player.id;
