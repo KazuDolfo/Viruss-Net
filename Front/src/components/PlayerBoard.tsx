@@ -69,8 +69,8 @@ const PlayerBoardBase: React.FC<PlayerBoardProps> = ({
       </div>
 
       <div className={cn(
-        "grid items-center justify-items-center border-2 border-dashed border-white/5 rounded-xl md:rounded-[2.5rem] bg-black/20 p-2 md:p-8 h-full",
-        compact ? "gap-1.5 md:gap-6" : "gap-3 md:gap-6",
+        "grid items-center justify-items-center border-2 border-dashed border-white/5 rounded-xl md:rounded-[2.5rem] bg-black/20 p-1 md:p-8 h-full",
+        compact ? "gap-1 md:gap-6" : "gap-2 md:gap-6",
         "grid-cols-4"
       )}>
         {slots.map((idx) => {
