@@ -37,6 +37,16 @@
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 
+@layer utilities {
+  @keyframes bounce-social {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-30px) scale(1.2); }
+  }
+  .animate-bounce-social {
+    animation: bounce-social 2s ease-in-out infinite;
+  }
+}
+
 body {
   margin: 0;
   overflow: hidden;

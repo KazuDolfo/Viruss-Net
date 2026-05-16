@@ -58,8 +58,21 @@ const App: React.FC = () => {
   const [localRoomId, setLocalRoomId] = useState('');
   const [playerName, setPlayerName] = useState('');
   const [copied, setCopied] = useState(false);
-  const [showLogs, setShowLogs] = useState(false);
   const [isCollectionOpen, setIsCollectionOpen] = useState(false);
+
+  const isConnected = useGameStore(state => state.isConnected);
+
+  const sendReaction = (reactionId: string) => {
+    if (roomCode && playerId) {
+      socket.emit('send_social', { roomId: roomCode, playerId, reactionId });
+    }
+  };
+
+  const sendMessage = (text: string) => {
+    if (roomCode && playerId) {
+      socket.emit('send_social', { roomId: roomCode, playerId, text });
+    }
+  };
 
   useEffect(() => {
     // Initial session setup if none exists
@@ -168,8 +181,8 @@ const App: React.FC = () => {
         <GameHeader 
           isMyTurn={isMyTurn} isDrawingState={isDrawingState}
           currentPlayerName={currentPlayer.name} deckCount={gameState.deck.length}
-          onShowLogs={() => setShowLogs(true)} onDrawCard={handleDrawCard}
-          showLogsActive={showLogs}
+          onShowLogs={() => {}} onDrawCard={handleDrawCard}
+          showLogsActive={false}
           isConnected={isConnected}
         />
         <PlayerHand 
@@ -177,6 +190,7 @@ const App: React.FC = () => {
           onCardClick={handleCardClick} isMyTurn={isMyTurn}
           isDrawingState={isDrawingState}
         />
+        <SocialDock onSendReaction={sendReaction} onSendMessage={sendMessage} />
       </div>
 
       {/* 4. Overlay Layer */}
@@ -188,21 +202,6 @@ const App: React.FC = () => {
           onClear={clearSelection} getCardHint={getCardHint}
         />
       </div>
-
-      {showLogs && (
-        <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setShowLogs(false)}>
-          <div className="bg-slate-900 w-full max-w-md rounded-[2rem] border-2 border-white/10 p-6" onClick={e => e.stopPropagation()}>
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-black uppercase italic flex items-center gap-2"><ScrollText className="text-blue-500" /> Notificaciones</h3>
-              <button onClick={() => setShowLogs(false)}><CheckCircle2 /></button>
-            </div>
-            <div className="flex flex-col items-center justify-center py-12 opacity-20">
-               <ScrollText size={64} className="mb-4" />
-               <p className="font-black uppercase tracking-widest">Sin registros nuevos</p>
-            </div>
-          </div>
-        </div>
-      )}
 
       {winnerPlayer && (
         <div className="fixed inset-0 bg-black/95 backdrop-blur-3xl flex items-center justify-center z-[200] p-4">

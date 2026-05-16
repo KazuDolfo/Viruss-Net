@@ -84,6 +84,7 @@ export const useSocketSync = () => {
     socket.on('connect_error', onConnectError);
     socket.on('room_update', onRoomUpdate);
     socket.on('game_update', onGameUpdate);
+    socket.on('social_event', onSocialEvent);
     socket.on('error', onError);
     
     document.addEventListener('visibilitychange', handleVisibilityChange);
@@ -99,6 +100,7 @@ export const useSocketSync = () => {
       socket.off('connect_error', onConnectError);
       socket.off('room_update', onRoomUpdate);
       socket.off('game_update', onGameUpdate);
+      socket.off('social_event', onSocialEvent);
       socket.off('error', onError);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
@@ -112,4 +114,6 @@ export const useSocketSync = () => {
   ]);
 
   return { isConnected: socket.connected };
+};
+ted };
 };

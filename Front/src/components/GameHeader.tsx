@@ -49,13 +49,6 @@ export const GameHeader: React.FC<GameHeaderProps> = ({
       </div>
 
       <div className="flex items-center gap-2 md:gap-3 shrink-0">
-        <button 
-          onClick={onShowLogs} 
-          className="p-2 md:p-3 rounded-xl md:rounded-2xl bg-slate-800/50 border border-white/10 hover:bg-slate-700 active:scale-90 transition-all shadow-lg"
-        >
-          <ScrollText className={cn("w-4 h-4 md:w-5 md:h-5", showLogsActive ? "text-blue-400" : "text-white/60")} />
-        </button>
-        
         <div 
           onClick={onDrawCard} 
           className={cn(

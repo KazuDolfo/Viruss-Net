@@ -46,6 +46,9 @@ const PlayerBoardBase: React.FC<PlayerBoardProps> = ({
           <div className="absolute inset-0 bg-blue-500/10 z-10 pointer-events-none" />
       )}
 
+      {/* Ephemeral Social Events */}
+      <FloatingSocial playerId={player.id} />
+
       <div className="flex justify-between items-center mb-2 md:mb-4 px-1 relative z-10 gap-2">
         <div className="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
           <h2 className={cn(

@@ -131,6 +131,20 @@ io.on('connection', (socket: Socket) => {
     }
   });
 
+  socket.on('send_social', ({ roomId, playerId, reactionId, text }) => {
+    try {
+        // Broadcast reaction/text to everyone in the room
+        io.to(roomId).emit('social_event', {
+            playerId,
+            reactionId,
+            text,
+            timestamp: Date.now()
+        });
+    } catch (e: any) {
+        logger.error('Social event failed', { error: e.message, roomId, playerId });
+    }
+  });
+
   socket.on('disconnect', () => {
     logger.info('User disconnected', { socketId: socket.id });
   });

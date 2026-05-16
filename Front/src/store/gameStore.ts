@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { GameState } from '@shared/models';
+import type { GameState, SocialEvent } from '@shared/index';
 
 interface GameStore {
   gameState: GameState | null;
@@ -9,6 +9,11 @@ interface GameStore {
   roomStatus: 'waiting' | 'playing' | 'finished';
   isDrawingState: boolean;
   isConnected: boolean;
+  
+  // Social State
+  activeSocialEvents: SocialEvent[];
+  addSocialEvent: (event: SocialEvent) => void;
+  removeSocialEvent: (timestamp: number) => void;
   
   // Actions
   setGameState: (state: GameState) => void;
@@ -29,6 +34,15 @@ export const useGameStore = create<GameStore>((set) => ({
   roomStatus: 'waiting',
   isDrawingState: false,
   isConnected: false,
+  activeSocialEvents: [],
+
+  addSocialEvent: (event) => set((state) => ({ 
+    activeSocialEvents: [...state.activeSocialEvents, event] 
+  })),
+
+  removeSocialEvent: (timestamp) => set((state) => ({
+    activeSocialEvents: state.activeSocialEvents.filter(e => e.timestamp !== timestamp)
+  })),
 
   setGameState: (gameState) => set({ gameState }),
   setRoomPlayers: (roomPlayers) => set({ roomPlayers }),
@@ -44,6 +58,7 @@ export const useGameStore = create<GameStore>((set) => ({
     roomPlayers: [],
     roomStatus: 'waiting',
     isDrawingState: false,
-    isConnected: false
+    isConnected: false,
+    activeSocialEvents: []
   }),
 }));
