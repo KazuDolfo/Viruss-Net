@@ -23,7 +23,7 @@ export const FloatingSocial: React.FC<FloatingSocialProps> = ({ playerId }) => {
   }, [playerEvents, removeEvent]);
 
   return (
-    <div className="absolute -top-10 md:-top-20 inset-x-0 pointer-events-none z-[100] flex flex-col items-center justify-center overflow-visible">
+    <div className="absolute -top-10 md:-top-16 inset-x-0 pointer-events-none z-[100] flex flex-col items-center justify-center overflow-visible">
       {playerEvents.map((event: SocialEvent) => {
         const reaction = (REACTIONS || []).find(r => r.id === event.reactionId);
         
@@ -38,25 +38,25 @@ export const FloatingSocial: React.FC<FloatingSocialProps> = ({ playerId }) => {
         return (
           <div 
             key={event.timestamp}
-            className={cn(
-              "absolute left-1/2 -translate-x-1/2 flex flex-col items-center w-full",
-              animClass
-            )}
+            className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center w-full"
           >
-            {/* EMOJI */}
-            {event.reactionId && (
-              <div className="text-6xl md:text-9xl drop-shadow-[0_10px_30px_rgba(0,0,0,0.5)] mb-2">
-                {reaction?.value || "❓"}
-              </div>
-            )}
+            {/* INNER ANIMATION CONTAINER - Prevents transform conflicts */}
+            <div className={cn("flex flex-col items-center w-full", animClass)}>
+              {/* EMOJI */}
+              {event.reactionId && (
+                <div className="text-6xl md:text-9xl drop-shadow-[0_10px_30px_rgba(0,0,0,0.5)] mb-2">
+                  {reaction?.value || "❓"}
+                </div>
+              )}
 
-            {/* TEXT */}
-            {event.text && (
-              <div className="bg-white text-slate-900 px-6 py-3 rounded-2xl font-black text-sm md:text-xl shadow-[0_20px_60px_rgba(0,0,0,0.6)] relative border-4 border-slate-900/10 text-center whitespace-nowrap scale-110">
-                {event.text}
-                <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-6 h-6 bg-white rotate-45 border-r-4 border-b-4 border-slate-900/10" />
-              </div>
-            )}
+              {/* TEXT */}
+              {event.text && (
+                <div className="bg-white text-slate-900 px-6 py-3 rounded-2xl font-black text-sm md:text-xl shadow-[0_20px_60px_rgba(0,0,0,0.6)] relative border-4 border-slate-900/10 text-center whitespace-nowrap scale-110">
+                  {event.text}
+                  <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-6 h-6 bg-white rotate-45 border-r-4 border-b-4 border-slate-900/10" />
+                </div>
+              )}
+            </div>
           </div>
         );
       })}

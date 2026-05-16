@@ -6,6 +6,7 @@ import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { REACTIONS } from '@shared/reactions';
 import { useGameStore } from '../store/gameStore';
+import { FloatingSocial } from './FloatingSocial';
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -136,14 +137,21 @@ export const CardCollectionModal: React.FC<CardCollectionModalProps> = ({ isOpen
     <div className="fixed inset-0 z-[100] flex flex-col md:items-center md:justify-center bg-black/80 backdrop-blur-xl animate-in fade-in duration-300" onClick={onClose}>
       <div 
         className={cn(
-          "bg-slate-900 w-full md:max-w-5xl md:h-[85vh] flex flex-col shadow-[0_0_100px_rgba(0,0,0,0.5)] border-white/5",
+          "bg-slate-900 w-full md:max-w-5xl md:h-[85vh] flex flex-col shadow-[0_0_100px_rgba(0,0,0,0.5)] border-white/5 relative",
           "mt-auto md:mt-0 rounded-t-[3rem] md:rounded-[3rem] md:border-4 animate-in slide-in-from-bottom-10 md:zoom-in-95 duration-500",
           "pb-[env(safe-area-inset-bottom)] h-[90vh] md:h-[85vh]"
         )}
         onClick={e => e.stopPropagation()}
       >
+        {/* TEST ZONE FOR SOCIAL EVENTS */}
+        {activeTab === 'reactions' && playerId && (
+           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 pointer-events-none z-[200]">
+              <FloatingSocial playerId={playerId} />
+           </div>
+        )}
+
         {/* Header */}
-        <div className="flex items-center justify-between p-6 md:p-10 border-b border-white/5">
+        <div className="flex items-center justify-between p-6 md:p-10 border-b border-white/5 relative z-10">
           <div className="flex items-center gap-4">
             {editingCard ? (
               <button onClick={() => setEditingCard(null)} className="p-3 bg-white/5 hover:bg-white/10 rounded-2xl transition-all">
@@ -180,7 +188,7 @@ export const CardCollectionModal: React.FC<CardCollectionModalProps> = ({ isOpen
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6 md:p-10 no-scrollbar">
+        <div className="flex-1 overflow-y-auto p-6 md:p-10 no-scrollbar relative z-10">
           {editingCard ? (
             /* EDITOR VIEW */
             <div className="max-w-2xl mx-auto flex flex-col md:flex-row gap-10 items-center animate-in fade-in zoom-in-95 duration-300">
