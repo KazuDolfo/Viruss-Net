@@ -69,7 +69,7 @@ const PlayerBoardBase: React.FC<PlayerBoardProps> = ({
 
       {/* Organs Area - Uses CSS Grid for perfect alignment */}
       <div className={cn(
-        "grid gap-2 md:gap-4 items-center justify-items-center border-2 border-dashed border-white/5 rounded-xl md:rounded-2xl bg-black/20 p-2 md:p-4 min-h-[120px] xs:min-h-[140px] md:min-h-[180px]",
+        "grid gap-2 md:gap-4 items-center justify-items-center border-2 border-dashed border-white/5 rounded-xl md:rounded-2xl bg-black/20 p-2 md:p-4 h-full",
         // Always 4 columns to save vertical space and maintain consistent layout
         "grid-cols-4"
       )}>
