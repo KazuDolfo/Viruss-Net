@@ -87,6 +87,12 @@ const App: React.FC = () => {
 
     sessionManager.save({ ...session, playerId: currentPId, sessionToken: currentToken });
     setPlayerId(currentPId);
+
+    // Detect iOS for specific UI fixes
+    const isIOS = /iPhone|iPad|iPod/.test(window.navigator.userAgent);
+    if (isIOS) {
+      document.documentElement.classList.add('is-ios');
+    }
   }, [setPlayerId]);
 
   const onJoinRoom = useCallback(() => {

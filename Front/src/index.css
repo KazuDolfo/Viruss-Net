@@ -35,6 +35,11 @@
   --board-stable-height: 100px;
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 16px);
+  --ios-extra-bottom: 0px;
+}
+
+.is-ios {
+  --ios-extra-bottom: 30px; /* Extra space for Safari's bottom toolbar */
 }
 
 @layer utilities {
