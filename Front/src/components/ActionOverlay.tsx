@@ -37,14 +37,14 @@ export const ActionOverlay: React.FC<ActionOverlayProps> = ({
           <div className="bg-slate-900/95 backdrop-blur-2xl p-4 md:p-8 rounded-[2rem] md:rounded-[3rem] border-[2px] md:border-[4px] border-white/10 shadow-[0_-20px_80px_rgba(0,0,0,0.8)] animate-in slide-in-from-bottom-10">
             <div className="flex flex-col md:flex-row gap-4 md:gap-12 items-center text-center md:text-left">
               <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-center md:justify-start gap-2 mb-2">
-                  <div className={cn("w-3 h-3 md:w-4 md:h-4 rounded-full shadow-[0_0_10px_rgba(255,255,255,0.2)]", colorMap[selectedCards[0].color])} />
-                  <span className="text-[10px] md:text-xs font-black text-slate-400 uppercase tracking-[0.3em] leading-none">{selectedCards[0].type}</span>
+                <div className="flex items-center justify-center md:justify-start gap-2 mb-1.5">
+                  <div className={cn("w-2.5 h-2.5 md:w-3 md:h-3 rounded-full shadow-[0_0_10px_rgba(255,255,255,0.1)]", colorMap[selectedCards[0].color])} />
+                  <span className="text-[9px] md:text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] leading-none">{selectedCards[0].type}</span>
                 </div>
-                <h3 className="text-2xl xs:text-3xl md:text-6xl font-black uppercase italic text-yellow-400 tracking-tighter mb-2 truncate leading-none">
+                <h3 className="text-xl xs:text-2xl md:text-4xl font-black uppercase italic text-yellow-400 tracking-tighter mb-1 truncate leading-none">
                   {selectedCards[0].name}
                 </h3>
-                <p className="text-xs md:text-xl text-slate-200 font-medium italic mb-6 md:mb-8 max-w-2xl line-clamp-2 leading-tight">
+                <p className="text-[10px] md:text-lg text-slate-300 font-medium italic mb-5 md:mb-6 max-w-xl line-clamp-2 leading-tight">
                   {getCardHint(selectedCards[0])}
                 </p>
                 
