@@ -76,18 +76,20 @@ const PlayerBoardBase: React.FC<PlayerBoardProps> = ({
         {slots.map((idx) => {
           const organ = player.body[idx];
           return (
-            <div key={idx} className="w-full flex justify-center aspect-[2/3] max-w-[100px] xs:max-w-[120px] md:max-w-none">
+            <div key={idx} className="w-full flex justify-center items-center aspect-[2/3]">
               {organ ? (
-                <OrganSlot 
-                  organ={organ} 
-                  onClick={() => onOrganClick(player.id, organ.id)}
-                  canTarget={canTargetOrgan(player.id, organ.id)}
-                  isSelected={pendingTargets.some(t => t.playerId === player.id && t.organId === organ.id)}
-                  small={compact}
-                />
+                <div className="w-full h-full flex justify-center items-center">
+                  <OrganSlot 
+                    organ={organ} 
+                    onClick={() => onOrganClick(player.id, organ.id)}
+                    canTarget={canTargetOrgan(player.id, organ.id)}
+                    isSelected={pendingTargets.some(t => t.playerId === player.id && t.organId === organ.id)}
+                    small={compact}
+                  />
+                </div>
               ) : (
-                <div className="w-full h-full border-2 border-dashed border-white/10 rounded-lg md:rounded-[2rem] flex items-center justify-center opacity-20">
-                  <div className="w-8 h-8 md:w-20 md:h-20 border-2 border-white/20 rounded-full" />
+                <div className="w-[75px] xs:w-[85px] md:w-[110px] lg:w-[130px] h-full border-2 border-dashed border-white/10 rounded-lg md:rounded-[2rem] flex items-center justify-center opacity-20">
+                  <div className="w-8 h-8 md:w-16 md:h-16 border-2 border-white/20 rounded-full" />
                 </div>
               )}
             </div>
