@@ -30,8 +30,6 @@ const PlayerBoardBase: React.FC<PlayerBoardProps> = ({
   compact = false
 }) => {
   const isTargetable = canTargetPlayer?.(player.id);
-
-  // Always render 4 slots
   const slots = [0, 1, 2, 3];
 
   return (
@@ -47,7 +45,6 @@ const PlayerBoardBase: React.FC<PlayerBoardProps> = ({
           <div className="absolute inset-0 bg-blue-500/10 z-10 pointer-events-none" />
       )}
 
-      {/* Ephemeral Social Events */}
       <FloatingSocial playerId={player.id} />
 
       <div className="flex justify-between items-center mb-2 md:mb-4 px-1 relative z-10 gap-2">
@@ -71,11 +68,9 @@ const PlayerBoardBase: React.FC<PlayerBoardProps> = ({
         </div>
       </div>
 
-      {/* Organs Area - Uses CSS Grid for perfect alignment */}
       <div className={cn(
         "grid items-center justify-items-center border-2 border-dashed border-white/5 rounded-xl md:rounded-[2.5rem] bg-black/20 p-2 md:p-8 h-full",
         compact ? "gap-1.5 md:gap-6" : "gap-3 md:gap-6",
-        // Always 4 columns to save vertical space and maintain consistent layout
         "grid-cols-4"
       )}>
         {slots.map((idx) => {
