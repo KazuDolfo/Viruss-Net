@@ -25,6 +25,11 @@
   --z-overlay: 50;
   --z-modal: 100;
 
+  /* Fluid Card Dimensions */
+  --card-w-base: clamp(75px, 12vw, 220px);
+  --card-w-small: clamp(65px, 10vw, 130px);
+  --card-aspect: 2/3;
+  
   /* HUD & Gaming Constraints */
   --hand-height: clamp(120px, 20vh, 160px);
   --board-stable-height: 100px;

@@ -34,53 +34,50 @@ export const ActionOverlay: React.FC<ActionOverlayProps> = ({
     )}>
       <div className="max-w-xl md:max-w-4xl mx-auto pointer-events-auto">
         {selectedCards.length === 1 && (
-          <div className="bg-slate-900/95 backdrop-blur-2xl p-3 md:p-6 rounded-[1.5rem] md:rounded-[2.5rem] border-[2px] md:border-[3px] border-white/10 shadow-[0_-20px_60px_rgba(0,0,0,0.6)] animate-in slide-in-from-bottom-10">
-            <div className="flex flex-row md:flex-row gap-3 md:gap-6 items-center">
-              <div className="shrink-0 w-16 xs:w-20 md:w-32">
-                <CardUI card={selectedCards[0]} />
-              </div>
+          <div className="bg-slate-900/95 backdrop-blur-2xl p-4 md:p-8 rounded-[2rem] md:rounded-[3rem] border-[2px] md:border-[4px] border-white/10 shadow-[0_-20px_80px_rgba(0,0,0,0.8)] animate-in slide-in-from-bottom-10">
+            <div className="flex flex-col md:flex-row gap-4 md:gap-12 items-center text-center md:text-left">
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1.5 mb-1">
-                  <div className={cn("w-2 h-2 md:w-2.5 md:h-2.5 rounded-full", colorMap[selectedCards[0].color])} />
-                  <span className="text-[8px] md:text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none">{selectedCards[0].type}</span>
+                <div className="flex items-center justify-center md:justify-start gap-2 mb-2">
+                  <div className={cn("w-3 h-3 md:w-4 md:h-4 rounded-full shadow-[0_0_10px_rgba(255,255,255,0.2)]", colorMap[selectedCards[0].color])} />
+                  <span className="text-[10px] md:text-xs font-black text-slate-400 uppercase tracking-[0.3em] leading-none">{selectedCards[0].type}</span>
                 </div>
-                <h3 className="text-lg xs:text-xl md:text-4xl font-black uppercase italic text-yellow-400 tracking-tighter mb-0.5 md:mb-1 truncate leading-none">
+                <h3 className="text-2xl xs:text-3xl md:text-6xl font-black uppercase italic text-yellow-400 tracking-tighter mb-2 truncate leading-none">
                   {selectedCards[0].name}
                 </h3>
-                <p className="text-[9px] md:text-sm text-slate-300 font-medium italic mb-3 md:mb-4 max-w-xl line-clamp-2 leading-tight">
+                <p className="text-xs md:text-xl text-slate-200 font-medium italic mb-6 md:mb-8 max-w-2xl line-clamp-2 leading-tight">
                   {getCardHint(selectedCards[0])}
                 </p>
                 
-                <div className="flex flex-wrap gap-1.5 md:gap-2">
+                <div className="flex flex-wrap justify-center md:justify-start gap-2 md:gap-4">
                   {selectedCards[0].type === 'organ' && (
                     <button 
                       onClick={onPlayOrgan} 
-                      className="bg-green-600 hover:bg-green-500 text-white px-3 py-2 md:px-5 md:py-2.5 rounded-lg md:rounded-xl font-black text-[9px] md:text-[10px] uppercase tracking-widest transition-all active:scale-95 shadow-lg border-b-[3px] md:border-b-4 border-green-800"
+                      className="bg-green-600 hover:bg-green-500 text-white px-6 py-3 md:px-10 md:py-5 rounded-xl md:rounded-2xl font-black text-xs md:text-xl uppercase tracking-widest transition-all active:scale-95 shadow-xl border-b-[4px] md:border-b-8 border-green-800"
                     >
-                      📥 BAJAR
+                      📥 BAJAR ÓRGANO
                     </button>
                   )}
                   {(selectedCards[0].name === 'Guante de látex' || selectedCards[0].name === 'Contagio') && (
                     <button 
                       onClick={onPlaySpecial} 
-                      className="bg-blue-600 hover:bg-blue-500 text-white px-3 py-2 md:px-5 md:py-2.5 rounded-lg md:rounded-xl font-black text-[9px] md:text-[10px] uppercase tracking-widest transition-all active:scale-95 shadow-lg border-b-[3px] md:border-b-4 border-blue-800"
+                      className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 md:px-10 md:py-5 rounded-xl md:rounded-2xl font-black text-xs md:text-xl uppercase tracking-widest transition-all active:scale-95 shadow-xl border-b-[4px] md:border-b-8 border-blue-800"
                     >
-                      🚀 USAR
+                      🚀 USAR ACCIÓN
                     </button>
                   )}
                   <button 
                     onClick={onDiscard} 
-                    className="bg-red-600 hover:bg-red-500 text-white px-3 py-2 md:px-5 md:py-2.5 rounded-lg md:rounded-xl font-black text-[9px] md:text-[10px] uppercase tracking-widest transition-all active:scale-95 shadow-lg border-b-[3px] md:border-b-4 border-red-800"
+                    className="bg-red-600 hover:bg-red-500 text-white px-6 py-3 md:px-10 md:py-5 rounded-xl md:rounded-2xl font-black text-xs md:text-xl uppercase tracking-widest transition-all active:scale-95 shadow-xl border-b-[4px] md:border-b-8 border-red-800"
                   >
-                    <Trash2 size={12} className="inline mr-1" /> DESCARTAR
+                    <Trash2 size={20} className="inline mr-2" /> DESCARTAR
                   </button>
                 </div>
               </div>
               <button 
                 onClick={onClear} 
-                className="p-2 md:p-3 bg-white/5 hover:bg-white/10 rounded-full text-white/30 hover:text-white transition-all self-start shrink-0"
+                className="hidden md:flex p-4 bg-white/5 hover:bg-white/10 rounded-full text-white/30 hover:text-white transition-all shrink-0"
               >
-                <CheckCircle2 className="w-5 h-5 md:w-6 md:h-6" />
+                <CheckCircle2 className="w-10 h-10" />
               </button>
             </div>
           </div>

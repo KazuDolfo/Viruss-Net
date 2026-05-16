@@ -130,12 +130,10 @@ const CardUIBase: React.FC<CardUIProps> = ({ card, onClick, selected, disabled, 
     <div
       onClick={!disabled ? onClick : undefined}
       className={cn(
-        'relative flex flex-col items-center justify-between rounded-[0.75rem] md:rounded-[1.25rem] border-[2px] md:border-[4px] p-1.5 md:p-2.5 transition-all cursor-pointer shadow-xl select-none touch-manipulation overflow-hidden group bg-gradient-to-b will-change-transform aspect-[2/3] shrink-0',
+        'relative flex flex-col items-center justify-between rounded-[0.75rem] md:rounded-[1.25rem] border-[2px] md:border-[4px] p-1.5 md:p-2.5 transition-all cursor-pointer shadow-xl select-none touch-manipulation overflow-hidden group bg-gradient-to-b will-change-transform aspect-[var(--card-aspect)] shrink-0',
         colorMap[card.color],
-        // Explicit widths instead of max-w/w-full to prevent collapse
-        small 
-          ? 'w-[75px] xs:w-[85px] md:w-[110px] lg:w-[130px]' 
-          : 'w-[110px] xs:w-[130px] md:w-[180px] lg:w-[220px]',
+        // Fluid width based on CSS variables
+        small ? 'w-[var(--card-w-small)]' : 'w-[var(--card-w-base)]',
         selected ? 'ring-4 ring-white -translate-y-4 scale-105 z-20 shadow-[0_0_40px_rgba(255,255,255,0.5)]' : !small && 'hover:-translate-y-2 hover:scale-[1.02]',
         disabled && 'opacity-40 grayscale cursor-not-allowed',
         className

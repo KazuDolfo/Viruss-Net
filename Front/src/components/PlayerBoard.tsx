@@ -88,7 +88,7 @@ const PlayerBoardBase: React.FC<PlayerBoardProps> = ({
                   />
                 </div>
               ) : (
-                <div className="w-[75px] xs:w-[85px] md:w-[110px] lg:w-[130px] h-full border-2 border-dashed border-white/10 rounded-lg md:rounded-[2rem] flex items-center justify-center opacity-20">
+                <div className="w-[var(--card-w-small)] aspect-[var(--card-aspect)] border-2 border-dashed border-white/10 rounded-lg md:rounded-[2rem] flex items-center justify-center opacity-20">
                   <div className="w-8 h-8 md:w-16 md:h-16 border-2 border-white/20 rounded-full" />
                 </div>
               )}
