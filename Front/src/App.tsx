@@ -89,11 +89,26 @@ const App: React.FC = () => {
     sessionManager.save({ ...session, playerId: currentPId, sessionToken: currentToken });
     setPlayerId(currentPId);
 
+    // Viewport Height Fix for Mobile (iOS/Android bars)
+    const updateVH = () => {
+      const vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty('--vh', `${vh}px`);
+    };
+
+    updateVH();
+    window.addEventListener('resize', updateVH);
+    window.addEventListener('orientationchange', updateVH);
+
     // Detect iOS for specific UI fixes
     const isIOS = /iPhone|iPad|iPod/.test(window.navigator.userAgent);
     if (isIOS) {
       document.documentElement.classList.add('is-ios');
     }
+
+    return () => {
+      window.removeEventListener('resize', updateVH);
+      window.removeEventListener('orientationchange', updateVH);
+    };
   }, [setPlayerId]);
 
   const onJoinRoom = useCallback(() => {
@@ -163,7 +178,10 @@ const App: React.FC = () => {
   const winnerPlayer = gameState.winnerId ? gameState.players.find(p => p.id === gameState.winnerId) : null;
 
   return (
-    <div className="fixed inset-0 bg-[#0b1120] text-white overflow-hidden flex flex-col font-sans select-none touch-manipulation">
+    <div 
+      className="fixed inset-0 bg-[#0b1120] text-white overflow-hidden flex flex-col font-sans select-none touch-manipulation"
+      style={{ height: 'calc(var(--vh, 1vh) * 100)' }}
+    >
       
       {/* 1. Background Layer */}
       <div className="layer-bg opacity-20 pointer-events-none">

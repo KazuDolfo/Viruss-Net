@@ -76,14 +76,20 @@ export const GameTable: React.FC<GameTableProps> = ({
   };
 
   return (
-    <main className="flex-1 relative overflow-y-auto lg:overflow-hidden px-3 md:px-8 pt-[30px] md:pt-12 pb-[280px] lg:pb-8 no-scrollbar layer-world flex flex-col items-center">
+    <main className={cn(
+      "flex-1 relative w-full layer-world no-scrollbar flex flex-col items-center",
+      "overflow-y-auto lg:overflow-hidden",
+      "px-3 md:px-8",
+      "pt-[calc(var(--safe-top)+4rem)] md:pt-12", 
+      "pb-[calc(var(--hand-height)+4rem)] lg:pb-8"
+    )}>
       
       {/* 1. RIVALS AREA (Carousel on Mobile, Grid on Desktop) */}
       <div 
         ref={carouselRef}
         onScroll={handleScroll}
         className={cn(
-          "w-full max-w-7xl flex flex-nowrap overflow-x-auto snap-x snap-mandatory gap-4 pb-4 no-scrollbar transition-all duration-500 mt-12 md:mt-0",
+          "w-full max-w-7xl flex-none flex flex-nowrap overflow-x-auto snap-x snap-mandatory gap-4 pb-4 no-scrollbar transition-all duration-500 mt-2 md:mt-0",
           "md:grid md:overflow-visible md:gap-8 md:pb-0",
           rivalsCount <= 2 ? "md:grid-cols-2" : 
           rivalsCount <= 3 ? "md:grid-cols-3" : 
@@ -94,7 +100,7 @@ export const GameTable: React.FC<GameTableProps> = ({
           <div 
             key={p.id} 
             id={`player-board-${p.id}`}
-            className="w-[92vw] md:w-auto shrink-0 snap-center transform hover:scale-[1.01] transition-transform duration-500"
+            className="w-[88vw] md:w-auto shrink-0 snap-center transform hover:scale-[1.01] transition-transform duration-500"
           >
             <PlayerBoard 
               player={p} 
@@ -106,37 +112,38 @@ export const GameTable: React.FC<GameTableProps> = ({
               canTargetOrgan={canTargetOrgan}
               onPlayerClick={handlePlayerTarget}
               canTargetPlayer={canTargetPlayer}
-              compact={false}
+              compact={rivalsCount > 2}
               isGameWinner={gameState.winnerId === p.id}
             />
-          </div>        ))}
+          </div>
+        ))}
       </div>
 
       {/* 2. TABLE CENTERPIECE (Turn Indicator) */}
-      <div className="flex justify-center items-center py-6 md:py-8">
+      <div className="flex-1 flex justify-center items-center py-4 md:py-8 min-h-[100px] md:min-h-0">
         <div className={cn(
           "px-6 py-2 md:px-10 md:py-4 rounded-[2rem] border-2 backdrop-blur-2xl transition-all duration-700 shadow-2xl flex flex-col items-center",
           isMyTurn 
-            ? "bg-yellow-500/10 border-yellow-500/40 shadow-yellow-500/5 scale-110" 
+            ? "bg-yellow-500/10 border-yellow-500/40 shadow-yellow-500/5 scale-105 md:scale-110" 
             : "bg-slate-900/40 border-white/5 opacity-80"
         )}>
           <div className="flex items-center gap-3">
-            {isMyTurn && <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse shadow-[0_0_10px_rgba(234,179,8,1)]" />}
+            {isMyTurn && <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-yellow-400 rounded-full animate-pulse shadow-[0_0_10px_rgba(234,179,8,1)]" />}
             <span className={cn(
-              "text-[9px] md:text-xs font-black uppercase tracking-[0.3em] leading-none",
+              "text-[8px] md:text-xs font-black uppercase tracking-[0.3em] leading-none",
               isMyTurn ? "text-yellow-500" : "text-slate-500"
             )}>
               {isMyTurn ? "TU TURNO" : `TURNO DE`}
             </span>
-            {isMyTurn && <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse shadow-[0_0_10px_rgba(234,179,8,1)]" />}
+            {isMyTurn && <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-yellow-400 rounded-full animate-pulse shadow-[0_0_10px_rgba(234,179,8,1)]" />}
           </div>
           {!isMyTurn && (
-            <span className="text-xl md:text-4xl font-black uppercase italic tracking-tighter text-white mt-1">
+            <span className="text-lg md:text-4xl font-black uppercase italic tracking-tighter text-white mt-1">
               {currentPlayer.name}
             </span>
           )}
           {isMyTurn && (
-             <span className="text-xl md:text-4xl font-black uppercase italic tracking-tighter text-yellow-400 mt-1 animate-pulse">
+             <span className="text-lg md:text-4xl font-black uppercase italic tracking-tighter text-yellow-400 mt-1 animate-pulse">
               ¡TE TOCA!
             </span>
           )}
@@ -144,7 +151,7 @@ export const GameTable: React.FC<GameTableProps> = ({
       </div>
 
       {/* 3. LOCAL PLAYER STAGE (Always visible at bottom) */}
-      <div id={`player-board-${myPlayer.id}`} className="w-full flex justify-center mt-4 md:mt-8 pb-12">
+      <div id={`player-board-${myPlayer.id}`} className="w-full flex-none flex justify-center mt-2 md:mt-8">
         <div className="w-full max-w-3xl transform hover:scale-[1.01] transition-transform duration-500">
           <PlayerBoard 
             player={myPlayer} 

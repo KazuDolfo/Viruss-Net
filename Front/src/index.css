@@ -22,11 +22,11 @@
   --z-overlay: 50;
   --z-modal: 100;
 
-  --card-w-base: clamp(105px, 18vw, 215px);
-  --card-w-small: clamp(65px, 10vw, 125px);
+  --card-w-base: clamp(80px, 16vw, 215px);
+  --card-w-small: clamp(55px, 9vw, 125px);
   --card-aspect: 2/3;
   
-  --hand-height: clamp(140px, 24vh, 190px);
+  --hand-height: clamp(120px, 20vh, 190px);
   --board-stable-height: 100px;
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 16px);
@@ -74,10 +74,14 @@
 body {
   margin: 0;
   overflow: hidden;
+  height: 100vh; /* Fallback */
   height: 100dvh;
+  height: calc(var(--vh, 1vh) * 100);
   background-color: #0b1120;
   touch-action: manipulation;
   overscroll-behavior: none;
+  position: fixed; /* Prevent bounce in some browsers */
+  width: 100%;
 }
 
 #root {
