@@ -22,15 +22,19 @@
   --z-overlay: 50;
   --z-modal: 100;
 
-  --card-w-base: clamp(80px, 16vw, 215px);
-  --card-w-small: clamp(55px, 9vw, 125px);
   --card-aspect: 2/3;
   
-  --hand-height: clamp(120px, 20vh, 190px);
+  /* Universal Fluid Sizing */
+  --card-w-base: min(215px, clamp(75px, 15vw, 18vh));
+  --card-w-small: min(120px, clamp(50px, 9vw, 11vh));
+  
+  --hand-height: clamp(110px, 18vh, 200px);
   --board-stable-height: 100px;
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 16px);
   --ios-extra-bottom: 0px;
+  
+  --board-max-width: 850px;
 }
 
 .is-ios {
@@ -113,4 +117,9 @@ body {
   width: 100%;
   aspect-ratio: 2/3;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.player-board-container {
+  container-type: inline-size;
+  width: 100%;
 }

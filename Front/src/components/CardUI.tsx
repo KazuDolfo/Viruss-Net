@@ -132,10 +132,8 @@ const CardUIBase: React.FC<CardUIProps> = ({ card, onClick, selected, disabled, 
       className={cn(
         'relative flex flex-col items-center justify-between rounded-[0.75rem] md:rounded-[1.25rem] border-[2px] md:border-[4px] p-1.5 md:p-2.5 transition-all cursor-pointer shadow-xl select-none touch-manipulation overflow-hidden group bg-gradient-to-b will-change-transform aspect-[var(--card-aspect)] shrink-0',
         colorMap[card.color],
-        // Responsive scaling: Clamp dimensions for fluid feel, but with strict max-widths for mobile/tablet
-        small 
-          ? 'w-[var(--card-w-small)] max-w-[80px] md:max-w-[110px] lg:max-w-[140px]' 
-          : 'w-[var(--card-w-base)] max-w-[110px] xs:max-w-[130px] md:max-w-[180px] lg:max-w-[240px]',
+        // Use the fluid variables directly
+        small ? 'w-[var(--card-w-small)]' : 'w-[var(--card-w-base)]',
         selected ? 'ring-4 ring-white -translate-y-4 scale-105 z-20 shadow-[0_0_40px_rgba(255,255,255,0.5)]' : !small && 'hover:-translate-y-2 hover:scale-[1.02]',
         disabled && 'opacity-40 grayscale cursor-not-allowed',
         className
@@ -170,12 +168,12 @@ const CardUIBase: React.FC<CardUIProps> = ({ card, onClick, selected, disabled, 
         )}>
           <span className={cn(
             "text-white font-black tracking-tighter uppercase text-center leading-none drop-shadow-md",
-            small ? "text-[7px] xs:text-[8px] md:text-[11px]" : "text-[11px] xs:text-[13px] md:text-lg mb-1"
+            small ? "text-[clamp(6px,1.5cqi,10px)]" : "text-[clamp(10px,2.5cqi,18px)] mb-1"
           )}>
             {card.name}
           </span>
           {card.description && !small && (
-             <p className="text-[7px] md:text-[10px] lg:text-xs text-white/80 font-medium text-center leading-tight line-clamp-2 md:line-clamp-3 italic px-1">
+             <p className="text-[clamp(6px,1.2cqi,12px)] text-white/80 font-medium text-center leading-tight line-clamp-2 md:line-clamp-3 italic px-1">
                {card.description}
              </p>
           )}

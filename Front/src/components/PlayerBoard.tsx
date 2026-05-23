@@ -69,14 +69,14 @@ const PlayerBoardBase: React.FC<PlayerBoardProps> = ({
       </div>
 
       <div className={cn(
-        "grid items-center justify-items-center border-2 border-dashed border-white/5 rounded-xl md:rounded-[2.5rem] bg-black/20 p-1 md:p-8 h-full",
-        compact ? "gap-1 md:gap-6" : "gap-2 md:gap-6",
+        "grid items-center justify-items-center border-2 border-dashed border-white/5 rounded-xl md:rounded-[2.5rem] bg-black/20 p-1 md:p-4 h-full",
+        compact ? "gap-1 md:gap-4" : "gap-2 md:gap-6",
         "grid-cols-4"
       )}>
         {slots.map((idx) => {
           const organ = player.body[idx];
           return (
-            <div key={idx} className="w-full flex justify-center items-center aspect-[2/3]">
+            <div key={idx} className="w-full flex justify-center items-center aspect-[2/3] min-h-0">
               {organ ? (
                 <div className="w-full h-full flex justify-center items-center">
                   <OrganSlot 
@@ -88,8 +88,8 @@ const PlayerBoardBase: React.FC<PlayerBoardProps> = ({
                   />
                 </div>
               ) : (
-                <div className="w-[var(--card-w-small)] aspect-[var(--card-aspect)] border-2 border-dashed border-white/10 rounded-lg md:rounded-[2rem] flex items-center justify-center opacity-20">
-                  <div className="w-8 h-8 md:w-16 md:h-16 border-2 border-white/20 rounded-full" />
+                <div className="w-full h-full border-2 border-dashed border-white/10 rounded-lg md:rounded-[1.5rem] flex items-center justify-center opacity-20 bg-white/5">
+                  <div className="w-1/3 h-1/3 border-2 border-white/20 rounded-full" />
                 </div>
               )}
             </div>

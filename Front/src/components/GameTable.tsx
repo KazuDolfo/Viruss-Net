@@ -78,29 +78,34 @@ export const GameTable: React.FC<GameTableProps> = ({
   return (
     <main className={cn(
       "flex-1 relative w-full layer-world no-scrollbar flex flex-col items-center",
-      "overflow-y-auto lg:overflow-hidden",
+      "overflow-y-auto lg:overflow-x-hidden", // Prevent horizontal scroll on desktop
       "px-3 md:px-8",
       "pt-[calc(var(--safe-top)+4rem)] md:pt-12", 
-      "pb-[calc(var(--hand-height)+4rem)] lg:pb-8"
+      "pb-[calc(var(--hand-height)+2rem)] lg:pb-8"
     )}>
       
-      {/* 1. RIVALS AREA (Carousel on Mobile, Grid on Desktop) */}
+      {/* 1. RIVALS AREA (Carousel on Mobile, Flex-Wrap on Desktop) */}
       <div 
         ref={carouselRef}
         onScroll={handleScroll}
         className={cn(
-          "w-full max-w-7xl flex-none flex flex-nowrap overflow-x-auto snap-x snap-mandatory gap-4 pb-4 no-scrollbar transition-all duration-500 mt-2 md:mt-0",
-          "md:grid md:overflow-visible md:gap-8 md:pb-0",
-          rivalsCount <= 2 ? "md:grid-cols-2" : 
-          rivalsCount <= 3 ? "md:grid-cols-3" : 
-          "md:grid-cols-3 lg:grid-cols-5"
+          "w-full max-w-[1600px] flex-none flex no-scrollbar transition-all duration-500 mt-2 md:mt-0",
+          // Mobile: Carousel
+          "flex-nowrap overflow-x-auto snap-x snap-mandatory gap-4 pb-4 md:pb-0",
+          // Desktop: Flex-Wrap with centering
+          "md:flex-wrap md:overflow-visible md:justify-center md:gap-x-6 md:gap-y-8"
         )}
       >
         {rivals.map((p) => (
           <div 
             key={p.id} 
             id={`player-board-${p.id}`}
-            className="w-[88vw] md:w-auto shrink-0 snap-center transform hover:scale-[1.01] transition-transform duration-500"
+            className={cn(
+                "snap-center transform hover:scale-[1.01] transition-transform duration-500 player-board-container",
+                "w-[88vw] shrink-0", // Mobile
+                "md:w-[calc(50%-1.5rem)] lg:w-[calc(33.33%-2rem)] xl:w-[calc(25%-2rem)] 2xl:w-[calc(20%-2rem)]", // Responsive widths
+                "md:max-w-[var(--board-max-width)]"
+            )}
           >
             <PlayerBoard 
               player={p} 
@@ -112,15 +117,15 @@ export const GameTable: React.FC<GameTableProps> = ({
               canTargetOrgan={canTargetOrgan}
               onPlayerClick={handlePlayerTarget}
               canTargetPlayer={canTargetPlayer}
-              compact={rivalsCount > 2}
+              compact={rivalsCount >= 4}
               isGameWinner={gameState.winnerId === p.id}
             />
           </div>
         ))}
       </div>
 
-      {/* 2. TABLE CENTERPIECE (Turn Indicator) */}
-      <div className="flex-1 flex justify-center items-center py-4 md:py-8 min-h-[100px] md:min-h-0">
+      {/* 2. TABLE CENTERPIECE (Turn Indicator - Grows to fill space) */}
+      <div className="flex-grow flex justify-center items-center py-6 md:py-12 min-h-[120px] md:min-h-0">
         <div className={cn(
           "px-6 py-2 md:px-10 md:py-4 rounded-[2rem] border-2 backdrop-blur-2xl transition-all duration-700 shadow-2xl flex flex-col items-center",
           isMyTurn 
@@ -151,8 +156,8 @@ export const GameTable: React.FC<GameTableProps> = ({
       </div>
 
       {/* 3. LOCAL PLAYER STAGE (Always visible at bottom) */}
-      <div id={`player-board-${myPlayer.id}`} className="w-full flex-none flex justify-center mt-2 md:mt-8">
-        <div className="w-full max-w-3xl transform hover:scale-[1.01] transition-transform duration-500">
+      <div id={`player-board-${myPlayer.id}`} className="w-full flex-none flex justify-center mt-2 md:mt-4 player-board-container">
+        <div className="w-full max-w-[var(--board-max-width)] transform hover:scale-[1.01] transition-transform duration-500">
           <PlayerBoard 
             player={myPlayer} 
             isActive={isMyTurn && !isDrawingState} 

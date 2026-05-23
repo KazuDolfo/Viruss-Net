@@ -46,11 +46,12 @@ export const PlayerHand: React.FC<PlayerHandProps> = ({
         </div>
 
         {/* COMPRESSED HAND ENGINE */}
-        <div className={cn(
-          "flex justify-center items-end transition-all duration-500 px-4",
-          // Increased breathing room: less negative space across all breakpoints
-          "-space-x-6 xs:-space-x-8 md:-space-x-10 lg:space-x-8"
-        )}>
+        <div 
+          className="flex justify-center items-end transition-all duration-500 px-4"
+          style={{ 
+            gap: 'clamp(-50px, -5vw, -10px)',
+          }}
+        >
           {hand.map((card, index) => {
             const isSelected = selectedCards.some(c => c.id === card.id);
             return (

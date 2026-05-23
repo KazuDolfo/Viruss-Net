@@ -53,7 +53,7 @@ export const ActionOverlay: React.FC<ActionOverlayProps> = ({
                 {selectedCards[0].type === 'organ' && (
                   <button 
                     onClick={onPlayOrgan} 
-                    className="flex-1 min-w-[120px] bg-green-600 hover:bg-green-500 text-white px-4 py-2.5 md:py-4 rounded-xl md:rounded-2xl font-black text-[10px] md:text-sm uppercase tracking-widest transition-all active:scale-95 shadow-lg border-b-4 border-green-800"
+                    className="flex-1 min-w-[80px] md:min-w-[120px] bg-green-600 hover:bg-green-500 text-white px-4 py-2.5 md:py-4 rounded-xl md:rounded-2xl font-black text-[10px] md:text-sm uppercase tracking-widest transition-all active:scale-95 shadow-lg border-b-4 border-green-800"
                   >
                     📥 BAJAR
                   </button>
@@ -61,14 +61,14 @@ export const ActionOverlay: React.FC<ActionOverlayProps> = ({
                 {(selectedCards[0].name === 'Guante de látex' || selectedCards[0].name === 'Contagio') && (
                   <button 
                     onClick={onPlaySpecial} 
-                    className="flex-1 min-w-[120px] bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 md:py-4 rounded-xl md:rounded-2xl font-black text-[10px] md:text-sm uppercase tracking-widest transition-all active:scale-95 shadow-lg border-b-4 border-blue-800"
+                    className="flex-1 min-w-[80px] md:min-w-[120px] bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 md:py-4 rounded-xl md:rounded-2xl font-black text-[10px] md:text-sm uppercase tracking-widest transition-all active:scale-95 shadow-lg border-b-4 border-blue-800"
                   >
                     🚀 ACCIÓN
                   </button>
                 )}
                 <button 
                   onClick={onDiscard} 
-                  className="flex-1 min-w-[120px] bg-red-600 hover:bg-red-500 text-white px-4 py-2.5 md:py-4 rounded-xl md:rounded-2xl font-black text-[10px] md:text-sm uppercase tracking-widest transition-all active:scale-95 shadow-lg border-b-4 border-red-800"
+                  className="flex-1 min-w-[80px] md:min-w-[120px] bg-red-600 hover:bg-red-500 text-white px-4 py-2.5 md:py-4 rounded-xl md:rounded-2xl font-black text-[10px] md:text-sm uppercase tracking-widest transition-all active:scale-95 shadow-lg border-b-4 border-red-800"
                 >
                   <Trash2 size={14} className="inline mr-1" /> DESCARTAR
                 </button>

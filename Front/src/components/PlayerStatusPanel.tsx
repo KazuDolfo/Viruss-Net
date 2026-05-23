@@ -23,8 +23,8 @@ export const PlayerStatusPanel: React.FC = () => {
   }, [focusedPlayerId, rivals, setFocusedPlayerId]);
 
   return (
-    <div className="fixed top-[calc(var(--safe-top)+0.5rem)] left-0 right-0 z-50 px-3 flex justify-end">
-      <div className="flex gap-3 overflow-x-auto no-scrollbar pb-2 max-w-[85vw]">
+    <div className="fixed top-[calc(var(--safe-top)+0.5rem)] left-0 right-0 z-50 px-3 flex justify-center md:justify-end">
+      <div className="flex gap-2 md:gap-3 overflow-x-auto no-scrollbar pb-2 max-w-full md:max-w-[85vw]">
         {rivals.map((player) => {
           const isFocused = focusedPlayerId === player.id;
           const isCurrentTurn = gameState.players[gameState.currentPlayerIndex].id === player.id;
@@ -43,7 +43,7 @@ export const PlayerStatusPanel: React.FC = () => {
               key={player.id}
               onClick={() => setFocusedPlayerId(player.id)}
               className={cn(
-                "flex flex-col items-center gap-1.5 px-4 py-2 rounded-2xl border transition-all shrink-0 shadow-xl backdrop-blur-xl active:scale-90",
+                "flex flex-col items-center gap-1 px-3 py-1.5 md:px-4 md:py-2 rounded-xl md:rounded-2xl border transition-all shrink-0 shadow-xl backdrop-blur-xl active:scale-95",
                 isFocused 
                   ? "bg-slate-800 border-blue-400 ring-2 ring-blue-400/30 scale-105" 
                   : isCurrentTurn 
@@ -52,16 +52,16 @@ export const PlayerStatusPanel: React.FC = () => {
               )}
             >
               <span className={cn(
-                "text-[10px] font-black uppercase tracking-widest",
+                "text-[8px] md:text-[10px] font-black uppercase tracking-widest",
                 isFocused ? "text-blue-400" : isCurrentTurn ? "text-yellow-400" : "text-white/40"
               )}>
                 {player.name}
               </span>
               
-              <div className="flex gap-1.5">
+              <div className="flex gap-1 md:gap-1.5">
                 {[0, 1, 2, 3].map((idx) => {
                   const organ = player.body[idx];
-                  if (!organ) return <div key={idx} className="w-2.5 h-2.5 rounded-full bg-white/5 border border-white/10" />;
+                  if (!organ) return <div key={idx} className="w-2 h-2 md:w-2.5 md:h-2.5 rounded-full bg-white/5 border border-white/10" />;
                   
                   const baseColor = organ.organCard.color;
                   const dotColor = colorClasses[baseColor] || 'bg-slate-500';
@@ -70,14 +70,14 @@ export const PlayerStatusPanel: React.FC = () => {
                     <div 
                       key={idx}
                       className={cn(
-                        "w-2.5 h-2.5 rounded-full relative",
+                        "w-2 h-2 md:w-2.5 md:h-2.5 rounded-full relative",
                         dotColor,
-                        organ.isImmune && "ring-2 ring-white shadow-[0_0_8px_rgba(255,255,255,0.8)]",
+                        organ.isImmune && "ring-1 md:ring-2 ring-white shadow-[0_0_8px_rgba(255,255,255,0.8)]",
                         organ.viruses.length > 0 && "animate-pulse"
                       )}
                     >
                       {organ.viruses.length > 0 && (
-                        <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-600 rounded-full border border-white/20" />
+                        <div className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 md:w-2 md:h-2 bg-red-600 rounded-full border border-white/20" />
                       )}
                     </div>
                   );
