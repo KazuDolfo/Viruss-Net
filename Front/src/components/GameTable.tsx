@@ -81,7 +81,7 @@ export const GameTable: React.FC<GameTableProps> = ({
       "overflow-y-auto lg:overflow-x-hidden", // Prevent horizontal scroll on desktop
       "px-3 md:px-8",
       "pt-[calc(var(--safe-top)+4rem)] md:pt-12", 
-      "pb-[calc(var(--hand-height)+2rem)] lg:pb-8"
+      "pb-[calc(var(--hand-height)+10rem)] lg:pb-8"
     )}>
       
       {/* 1. RIVALS AREA (Carousel on Mobile, Flex-Wrap on Desktop) */}
