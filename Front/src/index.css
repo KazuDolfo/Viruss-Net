@@ -25,10 +25,10 @@
   --card-aspect: 2/3;
   
   /* Universal Fluid Sizing */
-  --card-w-base: min(215px, clamp(75px, 15vw, 18vh));
-  --card-w-small: min(120px, clamp(50px, 9vw, 11vh));
+  --card-w-base: min(120px, clamp(65px, 13vw, 15vh));
+  --card-w-small: min(100px, clamp(50px, 9vw, 11vh));
   
-  --hand-height: clamp(110px, 18vh, 200px);
+  --hand-height: clamp(100px, 16vh, 170px);
   --board-stable-height: 100px;
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 16px);
@@ -122,4 +122,8 @@ body {
 .player-board-container {
   container-type: inline-size;
   width: 100%;
+}
+
+.card-container {
+  container-type: inline-size;
 }

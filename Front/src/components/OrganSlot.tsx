@@ -23,49 +23,47 @@ const OrganSlotBase: React.FC<OrganSlotProps> = ({ organ, onClick, canTarget, is
     <div 
       onClick={onClick}
       className={cn(
-        "relative group transition-all touch-manipulation",
+        "relative group transition-all touch-manipulation w-full h-full",
         canTarget ? 'cursor-pointer hover:ring-4 ring-yellow-400 rounded-xl animate-pulse' : '',
         isSelected ? 'ring-4 ring-green-500 rounded-xl scale-105 z-20 shadow-[0_0_20px_rgba(34,197,94,0.4)]' : ''
       )}
     >
       {/* Organ Card */}
-      <CardUI card={organ.organCard} disabled={!canTarget && !isSelected && onClick === undefined} small={small} selected={isSelected} />
+      <CardUI card={organ.organCard} disabled={!canTarget && !isSelected && onClick === undefined} small={small} selected={isSelected} className="w-full h-full absolute inset-0" />
 
       {/* Virus layer */}
       <div className={cn(
-        "absolute top-0 -left-1 md:-left-2 flex flex-col gap-1 z-20 transition-all duration-300",
-        small ? "scale-[0.85] xs:scale-[0.9] origin-top-left" : ""
+        "absolute -top-1 md:-top-2 -left-1 md:-left-2 flex flex-col gap-1 z-20 transition-all duration-300 w-full h-full pointer-events-none origin-top-left",
+        small ? "scale-[0.6] xs:scale-[0.65]" : "scale-[0.7] md:scale-[0.75]"
       )}>
         {organ.viruses.map((v: any, i: number) => (
-          <CardUI 
-            key={v.id} 
-            card={v} 
-            small 
-            className={cn(
-                "shadow-lg border-white/40 ring-1 ring-black/20 transition-all", 
-                i > 0 && "-mt-[70%] md:-mt-[80%]"
-            )} 
-          />
+          <div key={v.id} className={cn("w-full h-full relative", i > 0 && "-mt-[70%] md:-mt-[80%]")}>
+            <CardUI 
+              card={v} 
+              small 
+              className="shadow-[0_4px_15px_rgba(0,0,0,0.5)] border-white/40 ring-2 ring-red-500/50 transition-all pointer-events-auto absolute inset-0"
+            />
+          </div>
         ))}
       </div>
 
-      {/* Medicines layer */}
-      <div className={cn(
-        "absolute top-0 -right-1 md:-right-2 flex flex-col gap-1 z-20 transition-all duration-300",
-        small ? "scale-[0.85] xs:scale-[0.9] origin-top-right" : ""
-      )}>
-        {organ.medicines.map((m: any, i: number) => (
-          <CardUI 
-            key={m.id} 
-            card={m} 
-            small 
-            className={cn(
-                "shadow-lg border-white/40 ring-1 ring-black/20 transition-all", 
-                i > 0 && "-mt-[70%] md:-mt-[80%]"
-            )} 
-          />
-        ))}
-      </div>
+      {/* Medicines layer (Hidden if immune) */}
+      {!organ.isImmune && (
+        <div className={cn(
+          "absolute -top-1 md:-top-2 -right-1 md:-right-2 flex flex-col gap-1 z-20 transition-all duration-300 w-full h-full pointer-events-none origin-top-right",
+          small ? "scale-[0.6] xs:scale-[0.65]" : "scale-[0.7] md:scale-[0.75]"
+        )}>
+          {organ.medicines.map((m: any, i: number) => (
+            <div key={m.id} className={cn("w-full h-full relative", i > 0 && "-mt-[70%] md:-mt-[80%]")}>
+              <CardUI 
+                card={m} 
+                small 
+                className="shadow-[0_4px_15px_rgba(0,0,0,0.5)] border-white/40 ring-2 ring-blue-500/50 transition-all pointer-events-auto absolute inset-0"
+              />
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Immune indicator */}
       {organ.isImmune && (

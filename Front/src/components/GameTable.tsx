@@ -81,7 +81,7 @@ export const GameTable: React.FC<GameTableProps> = ({
       "overflow-y-auto lg:overflow-x-hidden", // Prevent horizontal scroll on desktop
       "px-3 md:px-8",
       "pt-[calc(var(--safe-top)+4rem)] md:pt-12", 
-      "pb-[calc(var(--hand-height)+10rem)] lg:pb-8"
+      "pb-[calc(var(--hand-height)+10rem)] lg:pb-[calc(var(--hand-height)+16rem)]"
     )}>
       
       {/* 1. RIVALS AREA (Carousel on Mobile, Flex-Wrap on Desktop) */}
@@ -101,10 +101,9 @@ export const GameTable: React.FC<GameTableProps> = ({
             key={p.id} 
             id={`player-board-${p.id}`}
             className={cn(
-                "snap-center transform hover:scale-[1.01] transition-transform duration-500 player-board-container",
-                "w-[88vw] shrink-0", // Mobile
-                "md:w-[calc(50%-1.5rem)] lg:w-[calc(33.33%-2rem)] xl:w-[calc(25%-2rem)] 2xl:w-[calc(20%-2rem)]", // Responsive widths
-                "md:max-w-[var(--board-max-width)]"
+                "snap-center transform hover:scale-[1.01] transition-all duration-700 ease-in-out player-board-container",
+                "shrink-0", // Mobile
+                "w-[88vw] max-w-[530px]" // Capped at 530px
             )}
           >
             <PlayerBoard 
@@ -157,7 +156,7 @@ export const GameTable: React.FC<GameTableProps> = ({
 
       {/* 3. LOCAL PLAYER STAGE (Always visible at bottom) */}
       <div id={`player-board-${myPlayer.id}`} className="w-full flex-none flex justify-center mt-2 md:mt-4 player-board-container">
-        <div className="w-full max-w-[var(--board-max-width)] transform hover:scale-[1.01] transition-transform duration-500">
+        <div className="w-[92vw] max-w-[650px] transform hover:scale-[1.01] transition-all duration-700 ease-in-out">
           <PlayerBoard 
             player={myPlayer} 
             isActive={isMyTurn && !isDrawingState} 

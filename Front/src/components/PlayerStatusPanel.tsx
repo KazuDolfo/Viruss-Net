@@ -23,7 +23,7 @@ export const PlayerStatusPanel: React.FC = () => {
   }, [focusedPlayerId, rivals, setFocusedPlayerId]);
 
   return (
-    <div className="fixed top-[calc(var(--safe-top)+0.5rem)] left-0 right-0 z-50 px-16 flex justify-center">
+    <div className="fixed top-[calc(var(--safe-top)+0.5rem)] left-0 right-0 z-50 px-2 sm:px-4 md:px-16 flex justify-center">
       <div className="flex gap-1.5 md:gap-3 overflow-x-auto no-scrollbar pb-2 max-w-full">
         {rivals.map((player) => {
           const isFocused = focusedPlayerId === player.id;
@@ -43,9 +43,9 @@ export const PlayerStatusPanel: React.FC = () => {
               key={player.id}
               onClick={() => setFocusedPlayerId(player.id)}
               className={cn(
-                "flex flex-col items-center gap-1 px-2.5 py-1.5 md:px-4 md:py-2 rounded-xl md:rounded-2xl border transition-all shrink-0 shadow-xl backdrop-blur-xl active:scale-95",
+                "flex flex-col items-center gap-1 px-2.5 py-1.5 md:px-4 md:py-2 rounded-xl md:rounded-2xl border transition-all shrink-0 shadow-xl backdrop-blur-xl",
                 isFocused 
-                  ? "bg-slate-800 border-blue-400 ring-2 ring-blue-400/30 scale-105" 
+                  ? "bg-slate-800 border-blue-400 ring-2 ring-blue-400/30 scale-100" 
                   : isCurrentTurn 
                     ? "bg-yellow-500/10 border-yellow-500/40" 
                     : "bg-slate-900/80 border-white/5 opacity-60 hover:opacity-100"
