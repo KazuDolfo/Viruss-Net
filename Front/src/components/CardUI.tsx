@@ -130,10 +130,11 @@ const CardUIBase: React.FC<CardUIProps> = ({ card, onClick, selected, disabled, 
     <div
       onClick={!disabled ? onClick : undefined}
       className={cn(
-        'relative flex flex-col items-center justify-between rounded-[0.75rem] md:rounded-[1.25rem] border-[2px] md:border-[4px] p-1.5 md:p-2.5 transition-all cursor-pointer shadow-xl select-none touch-manipulation overflow-hidden group bg-gradient-to-b will-change-transform aspect-[var(--card-aspect)] shrink-0',
+        'relative flex flex-col items-center justify-between border-[2px] md:border-[3px] p-1.5 md:p-2 transition-all cursor-pointer shadow-xl select-none touch-manipulation overflow-hidden group bg-gradient-to-b will-change-transform aspect-[var(--card-aspect)] shrink-0 card-container',
+        small ? 'rounded-md' : 'rounded-lg md:rounded-xl',
         colorMap[card.color],
-        // Use the fluid variables directly
-        small ? 'w-[var(--card-w-small)]' : 'w-[var(--card-w-base)]',
+        // Use the fluid variables directly or fill container if small
+        small ? 'w-full h-full' : 'w-[var(--card-w-base)]',
         selected ? 'ring-4 ring-white -translate-y-4 scale-105 z-20 shadow-[0_0_40px_rgba(255,255,255,0.5)]' : !small && 'hover:-translate-y-2 hover:scale-[1.02]',
         disabled && 'opacity-40 grayscale cursor-not-allowed',
         className
@@ -163,17 +164,17 @@ const CardUIBase: React.FC<CardUIProps> = ({ card, onClick, selected, disabled, 
       {/* OVERLAY LABEL & DESCRIPTION */}
       {showImage && (
         <div className={cn(
-          "absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent z-20 flex flex-col items-center justify-end px-2 transition-all",
-          small ? "h-1/3 pb-1.5 md:pb-2.5" : "h-1/2 pb-3 md:pb-6 group-hover:h-2/3"
+          "absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent z-20 flex flex-col items-center justify-end px-1 md:px-2 transition-all",
+          small ? "h-[45%] pb-1 md:pb-2" : "h-[45%] pb-2 md:pb-4 group-hover:h-[55%]"
         )}>
           <span className={cn(
             "text-white font-black tracking-tighter uppercase text-center leading-none drop-shadow-md",
-            small ? "text-[clamp(6px,1.5cqi,10px)]" : "text-[clamp(10px,2.5cqi,18px)] mb-1"
+            small ? "text-[clamp(5px,12cqi,14px)]" : "text-[clamp(8px,10cqi,20px)] mb-0.5 md:mb-1"
           )}>
             {card.name}
           </span>
           {card.description && !small && (
-             <p className="text-[clamp(6px,1.2cqi,12px)] text-white/80 font-medium text-center leading-tight line-clamp-2 md:line-clamp-3 italic px-1">
+             <p className="text-[clamp(5px,7.5cqi,14px)] text-white/80 font-medium text-center leading-tight line-clamp-2 md:line-clamp-3 italic px-1 mt-0.5 md:mt-1">
                {card.description}
              </p>
           )}
@@ -183,15 +184,15 @@ const CardUIBase: React.FC<CardUIProps> = ({ card, onClick, selected, disabled, 
       {/* BASE DESIGN / FALLBACK */}
       {showFallback && (
         <>
-          <div className="flex flex-col items-center gap-1 z-20 w-full px-1">
+          <div className="flex flex-col items-center gap-0.5 md:gap-1 z-20 w-full px-1 mt-1">
             <div className={cn(
                "text-white font-black text-center leading-tight drop-shadow-lg",
-               small ? "text-[8px] md:text-[12px]" : "text-[12px] md:text-lg"
+               small ? "text-[clamp(6px,14cqi,16px)]" : "text-[clamp(10px,12cqi,24px)]"
             )}>
               {card.name}
             </div>
             {!small && card.description && (
-              <p className="text-[8px] md:text-xs text-white/70 font-medium text-center leading-tight line-clamp-2 italic px-2">
+              <p className="text-[clamp(6px,8cqi,14px)] text-white/70 font-medium text-center leading-tight line-clamp-2 italic px-1 md:px-2">
                 {card.description}
               </p>
             )}
