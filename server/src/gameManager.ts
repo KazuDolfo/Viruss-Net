@@ -2,6 +2,7 @@ import {
     GameState, 
     initGame, 
     reduceGameState, 
+    validateAction,
     ActionRequest,
     GameAction
 } from '../../shared/index';
@@ -81,14 +82,13 @@ export const processAction = (roomId: string, playerId: string, action: GameActi
     
     const request: ActionRequest = { playerId, action };
     
-    // The engine handles validation and reduction in one pure step
-    // (though validateAction is called inside reduceGameState)
-    const nextState = reduceGameState(room.gameState, request);
-    
-    // If state didn't change, it means validation failed or action did nothing
-    if (nextState === room.gameState) {
-        throw new Error('Action rejected by engine');
+    const error = validateAction(room.gameState, request);
+    if (error) {
+        console.error('Validation failed!', { error, action });
+        throw new Error(error);
     }
+
+    const nextState = reduceGameState(room.gameState, request);
 
     room.gameState = nextState;
     room.lastActivity = Date.now();

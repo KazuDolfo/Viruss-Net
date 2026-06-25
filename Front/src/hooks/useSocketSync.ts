@@ -73,6 +73,17 @@ export const useSocketSync = () => {
 
     const onError = (error: string) => {
       console.error('🔥 Game Error:', error);
+      if (
+        error === 'Room is already playing' || 
+        error === 'Room not found' || 
+        error === 'Unauthorized: Invalid session' ||
+        error === 'Invalid session token'
+      ) {
+        sessionManager.clear();
+        window.location.reload();
+      } else {
+        alert(error);
+      }
     };
 
     const handleVisibilityChange = () => {
