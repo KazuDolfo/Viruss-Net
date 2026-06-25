@@ -2,7 +2,7 @@ import React from 'react';
 import type { Card } from '@shared/models';
 import { CardUI } from './CardUI';
 import { cn } from '../utils/cn';
-import { Hand } from 'lucide-react';
+import { Hand, Zap } from 'lucide-react';
 
 interface PlayerHandProps {
   hand: readonly Card[];
@@ -10,6 +10,7 @@ interface PlayerHandProps {
   onCardClick: (card: Card) => void;
   isMyTurn: boolean;
   isDrawingState: boolean;
+  onLeave: () => void;
 }
 
 export const PlayerHand: React.FC<PlayerHandProps> = ({
@@ -17,7 +18,8 @@ export const PlayerHand: React.FC<PlayerHandProps> = ({
   selectedCards,
   onCardClick,
   isMyTurn,
-  isDrawingState
+  isDrawingState,
+  onLeave
 }) => {
   return (
     <div 
@@ -29,6 +31,17 @@ export const PlayerHand: React.FC<PlayerHandProps> = ({
     >
       {/* GLOW BACKGROUND EFFECT */}
       <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-slate-950/95 to-transparent pointer-events-none" />
+
+      {/* EXIT BUTTON */}
+      <div className="absolute right-4 bottom-4 md:right-8 md:bottom-8 z-50 pointer-events-auto">
+        <button 
+          onClick={onLeave}
+          className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-red-500/10 backdrop-blur-xl border border-red-500/20 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all shadow-xl active:scale-90"
+          title="Salir de la sala"
+        >
+          <Zap size={18} className="rotate-180 md:w-6 md:h-6" />
+        </button>
+      </div>
 
       <div className="max-w-screen-xl mx-auto relative z-10">
         {/* Indicators */}
@@ -47,10 +60,7 @@ export const PlayerHand: React.FC<PlayerHandProps> = ({
 
         {/* COMPRESSED HAND ENGINE */}
         <div 
-          className="flex justify-center items-end transition-all duration-500 px-4"
-          style={{ 
-            gap: 'clamp(-50px, -5vw, -10px)',
-          }}
+          className="flex justify-center items-end transition-all duration-500 px-2 sm:px-4 pb-2 gap-2 sm:gap-4 md:gap-6"
         >
           {hand.map((card, index) => {
             const isSelected = selectedCards.some(c => c.id === card.id);
@@ -60,10 +70,10 @@ export const PlayerHand: React.FC<PlayerHandProps> = ({
                 className={cn(
                   "relative transition-all duration-300 ease-out will-change-transform transform-gpu",
                   // Dynamic Z-Index: selected cards always on top, others follow index
-                  isSelected ? "z-50 -translate-y-6 md:-translate-y-12 scale-110" : "z-[index] hover:z-40 hover:-translate-y-8 hover:scale-105",
-                  // Fan effect: keep it subtle on mobile, straight on large PC
-                  index === 0 && hand.length > 1 && "-rotate-3 lg:rotate-0",
-                  index === hand.length - 1 && hand.length > 1 && "rotate-3 lg:rotate-0"
+                  isSelected ? "z-50 -translate-y-4 md:-translate-y-8 scale-105 md:scale-110" : "z-[index] hover:z-40 hover:-translate-y-2 hover:scale-[1.02]",
+                  // Fan effect: keep it subtle
+                  index === 0 && hand.length > 1 && "-rotate-[2deg] sm:-rotate-2 lg:rotate-0 origin-bottom-right",
+                  index === hand.length - 1 && hand.length > 1 && "rotate-[2deg] sm:rotate-2 lg:rotate-0 origin-bottom-left"
                 )}
                 style={{ zIndex: isSelected ? 50 : 10 + index }}
               >
