@@ -76,6 +76,8 @@ export const useSocketSync = () => {
       if (
         error === 'Room is already playing' || 
         error === 'Room not found' || 
+        error === 'Código de Sala Inválido o Cerrado.' ||
+        error === 'La sala ha sido cerrada por el anfitrión.' ||
         error === 'Unauthorized: Invalid session' ||
         error === 'Invalid session token'
       ) {
