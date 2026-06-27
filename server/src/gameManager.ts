@@ -59,19 +59,31 @@ export const leaveRoom = (roomId: string, playerId: string) => {
         // Player surrendered
         const pIndex = room.gameState.players.findIndex(p => p.id === playerId);
         if (pIndex !== -1) {
-            // Handle turn pass if it was their turn
-            if (room.gameState.currentTurn === playerId) {
-                const nextIndex = (pIndex + 1) % room.gameState.players.length;
-                room.gameState.currentTurn = room.gameState.players[nextIndex]?.id || '';
-            }
-            // Remove from game state
-            room.gameState.players.splice(pIndex, 1);
+            let nextPlayerIndex = room.gameState.currentPlayerIndex;
             
-            // Check if only one player left (Winner!)
-            if (room.gameState.players.length === 1) {
-                room.gameState.winnerId = room.gameState.players[0].id;
+            // Ajustar índice de turno
+            if (pIndex < nextPlayerIndex) {
+                nextPlayerIndex = nextPlayerIndex - 1;
+            }
+            
+            const newPlayers = room.gameState.players.filter(p => p.id !== playerId);
+            
+            if (newPlayers.length > 0) {
+                nextPlayerIndex = nextPlayerIndex % newPlayers.length;
+            }
+
+            let winnerId = room.gameState.winnerId;
+            if (newPlayers.length === 1) {
+                winnerId = newPlayers[0].id;
                 room.status = 'finished';
             }
+
+            room.gameState = {
+                ...room.gameState,
+                players: newPlayers,
+                currentPlayerIndex: nextPlayerIndex,
+                winnerId
+            };
         }
     }
 
