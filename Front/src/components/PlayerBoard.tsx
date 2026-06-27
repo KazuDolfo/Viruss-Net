@@ -3,6 +3,7 @@ import type { Player, Card } from '@shared/models';
 import { OrganSlot } from './OrganSlot';
 import { cn } from '../utils/cn';
 import { FloatingSocial } from './FloatingSocial';
+import { useGameStore } from '../store/gameStore';
 
 interface PlayerBoardProps {
   player: Player;
@@ -18,7 +19,7 @@ interface PlayerBoardProps {
   compact?: boolean;
 }
 
-const PlayerBoardBase: React.FC<PlayerBoardProps> = ({ 
+export const PlayerBoardBase: React.FC<PlayerBoardProps> = ({ 
   player, 
   isActive, 
   pendingTargets = [],
@@ -31,6 +32,8 @@ const PlayerBoardBase: React.FC<PlayerBoardProps> = ({
 }) => {
   const isTargetable = canTargetPlayer?.(player.id);
   const slots = [0, 1, 2, 3];
+  
+  const connected = useGameStore(state => state.roomPlayers.find(p => p.id === player.id)?.connected !== false);
 
   return (
     <div 
@@ -39,7 +42,8 @@ const PlayerBoardBase: React.FC<PlayerBoardProps> = ({
       'rounded-[1.5rem] md:rounded-[2rem] transition-all border-[2px] md:border-[3px] flex flex-col relative will-change-transform',
       isActive ? 'bg-slate-800/95 border-yellow-500 shadow-[0_0_40px_rgba(234,179,8,0.2)]' : 'bg-slate-900/40 border-white/5 opacity-70 hover:opacity-100',
       compact ? 'p-2 md:p-3 w-full' : 'p-3 md:p-6 w-full shadow-2xl',
-      isTargetable && 'cursor-pointer ring-4 ring-blue-500 ring-offset-4 ring-offset-slate-900 animate-pulse z-20'
+      isTargetable && 'cursor-pointer ring-4 ring-blue-500 ring-offset-4 ring-offset-slate-900 animate-pulse z-20',
+      !connected && 'grayscale-[0.5] opacity-50'
     )}>
       {isTargetable && (
           <div className="absolute inset-0 bg-blue-500/10 z-10 pointer-events-none" />
@@ -48,16 +52,21 @@ const PlayerBoardBase: React.FC<PlayerBoardProps> = ({
       <FloatingSocial playerId={player.id} />
 
       <div className="flex justify-between items-center mb-2 md:mb-4 px-1 relative z-10 gap-2">
-        <div className="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
-          <h2 className={cn(
-             'font-black uppercase tracking-tight flex items-center gap-1.5 min-w-0',
-             isActive ? 'text-yellow-400' : 'text-slate-200',
-             compact ? 'text-xs md:text-sm' : 'text-sm xs:text-base md:text-2xl'
-           )}>
-            <span className="truncate">{player.name}</span>
-            {isGameWinner && <span className="text-yellow-500 drop-shadow-[0_0_10px_rgba(234,179,8,0.8)] shrink-0">🏆</span>}
-          </h2>
-          {isActive && <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-yellow-400 rounded-full animate-pulse shadow-[0_0_10px_rgba(234,179,8,1)] shrink-0" />}
+        <div className="flex flex-col min-w-0 flex-1">
+          <div className="flex items-center gap-2 md:gap-3">
+            <h2 className={cn(
+               'font-black uppercase tracking-tight flex items-center gap-1.5 min-w-0',
+               isActive ? 'text-yellow-400' : 'text-slate-200',
+               compact ? 'text-xs md:text-sm' : 'text-sm xs:text-base md:text-2xl'
+             )}>
+              <span className="truncate">{player.name}</span>
+              {isGameWinner && <span className="text-yellow-500 drop-shadow-[0_0_10px_rgba(234,179,8,0.8)] shrink-0">🏆</span>}
+            </h2>
+            {isActive && <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-yellow-400 rounded-full animate-pulse shadow-[0_0_10px_rgba(234,179,8,1)] shrink-0" />}
+          </div>
+          {!connected && (
+            <span className="text-xs text-red-400 font-bold animate-pulse mt-0.5">Desconectado (Esperando...)</span>
+          )}
         </div>
         
         <div className={cn(

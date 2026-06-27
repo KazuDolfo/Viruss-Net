@@ -3,59 +3,68 @@ import { useGameStore } from '../store/gameStore';
 import { sessionManager } from '../core/session';
 
 export const useGameActions = () => {
-  const { playerId, roomCode } = useGameStore();
-
   const joinRoom = (roomId: string, playerName: string, sessionToken: string) => {
-    // When joining manually, we save the session
+    const session = sessionManager.get();
+    const currentPid = session.playerId;
+    
     sessionManager.save({ 
       roomCode: roomId, 
       playerName, 
       sessionToken,
-      playerId // Note: playerId might be null initially if it's a new player
+      playerId: currentPid
     });
     
-    socket.emit('join_room', { roomId, playerName, playerId, sessionToken });
+    socket.emit('join_room', { roomId, playerName, playerId: currentPid, sessionToken });
   };
 
   const startGame = () => {
-    if (roomCode) {
-      socket.emit('start_game', { roomId: roomCode });
+    const session = sessionManager.get();
+    if (session.roomCode) {
+      socket.emit('start_game', { roomId: session.roomCode });
     }
   };
 
   const sendAction = (type: string, payload: any) => {
     const session = sessionManager.get();
 
-    if (roomCode && playerId && session.sessionToken) {
+    if (session.roomCode && session.playerId && session.sessionToken) {
       socket.emit('play_action', { 
-        roomId: roomCode, 
-        playerId, 
+        roomId: session.roomCode, 
+        playerId: session.playerId, 
         sessionToken: session.sessionToken, 
         action: { type, ...payload } 
       });
     } else {
-      console.error('❌ Cannot send action: Missing context', { roomCode, playerId, hasToken: !!session.sessionToken });
+      console.error('❌ Cannot send action: Missing context', session);
     }
   };
 
   const leaveRoom = () => {
+    const session = sessionManager.get();
+    if (session.roomCode && session.playerId) {
+      socket.emit('leave_room', { roomId: session.roomCode, playerId: session.playerId });
+    }
     sessionManager.clear();
     window.location.reload();
   };
 
   const createRoom = (roomId: string, playerName: string, sessionToken: string) => {
+    const session = sessionManager.get();
+    const currentPid = session.playerId;
+
     sessionManager.save({ 
       roomCode: roomId, 
       playerName, 
       sessionToken,
-      playerId
+      playerId: currentPid
     });
-    socket.emit('create_room', { roomId, playerName, playerId, sessionToken });
+    socket.emit('create_room', { roomId, playerName, playerId: currentPid, sessionToken });
   };
 
   const closeRoom = () => {
-    if (roomCode && playerId) {
-      socket.emit('close_room', { roomId: roomCode, playerId });
+    const session = sessionManager.get();
+    if (session.roomCode && session.playerId) {
+      socket.emit('close_room', { roomId: session.roomCode, playerId: session.playerId });
     }
   };
 

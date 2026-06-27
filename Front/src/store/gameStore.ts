@@ -5,7 +5,7 @@ interface GameStore {
   gameState: GameState | null;
   playerId: string | null;
   roomCode: string | null;
-  roomPlayers: { id: string, name: string }[];
+  roomPlayers: { id: string; name: string; connected?: boolean }[];
   roomStatus: 'waiting' | 'playing' | 'finished';
   isDrawingState: boolean;
   isConnected: boolean;
@@ -18,7 +18,7 @@ interface GameStore {
   
   // Actions
   setGameState: (state: GameState) => void;
-  setRoomPlayers: (players: { id: string, name: string }[]) => void;
+  setRoomPlayers: (players: { id: string; name: string; connected?: boolean }[]) => void;
   setRoomStatus: (status: 'waiting' | 'playing' | 'finished') => void;
   setPlayerId: (id: string) => void;
   setRoomCode: (code: string | null) => void;

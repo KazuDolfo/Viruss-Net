@@ -49,6 +49,41 @@ export const closeRoom = (roomId: string, playerId: string) => {
     throw new Error('No tienes permisos para cerrar esta sala o la sala no existe.');
 };
 
+export const leaveRoom = (roomId: string, playerId: string) => {
+    const room = rooms[roomId];
+    if (!room) return null;
+    
+    room.players = room.players.filter(p => p.id !== playerId);
+    
+    if (room.status === 'playing' && room.gameState) {
+        // Player surrendered
+        const pIndex = room.gameState.players.findIndex(p => p.id === playerId);
+        if (pIndex !== -1) {
+            // Handle turn pass if it was their turn
+            if (room.gameState.currentTurn === playerId) {
+                const nextIndex = (pIndex + 1) % room.gameState.players.length;
+                room.gameState.currentTurn = room.gameState.players[nextIndex]?.id || '';
+            }
+            // Remove from game state
+            room.gameState.players.splice(pIndex, 1);
+            
+            // Check if only one player left (Winner!)
+            if (room.gameState.players.length === 1) {
+                room.gameState.winnerId = room.gameState.players[0].id;
+                room.status = 'finished';
+            }
+        }
+    }
+
+    if (room.players.length === 0) {
+        delete rooms[roomId];
+        return null; // Room deleted
+    }
+    
+    room.lastActivity = Date.now();
+    return room;
+};
+
 export const joinRoom = (roomId: string, player: { id: string, name: string, socketId: string, sessionToken: string }) => {
     if (!rooms[roomId]) {
         throw new Error('Código de Sala Inválido o Cerrado.');
@@ -124,27 +159,33 @@ export const processAction = (roomId: string, playerId: string, action: GameActi
 
 export const handleDisconnect = (socketId: string) => {
     let affectedRoomId: string | null = null;
+    let roomRef: any = null;
 
     Object.keys(rooms).forEach(roomId => {
         const room = rooms[roomId];
-        const player = room.players.find(p => p.socketId === socketId);
+        const playerIndex = room.players.findIndex(p => p.socketId === socketId);
         
-        if (player) {
+        if (playerIndex !== -1) {
             affectedRoomId = roomId;
-            // Mark player as disconnected by clearing socketId
-            // but DO NOT remove them from the room to allow reconnection
-            player.socketId = '';
+            roomRef = room;
             
-            // If the room is now completely empty, we can clean it up
-            const activeConnections = room.players.filter(p => p.socketId !== '').length;
-            if (activeConnections === 0) {
-                // Keep the room for a while even if empty, but cleanupRooms will handle it
-                room.lastActivity = Date.now();
+            if (room.status === 'waiting') {
+                room.players.splice(playerIndex, 1);
+                if (room.players.length === 0) {
+                    delete rooms[roomId];
+                    roomRef = null;
+                }
+            } else {
+                room.players[playerIndex].socketId = '';
+                const activeConnections = room.players.filter(p => p.socketId !== '').length;
+                if (activeConnections === 0) {
+                    room.lastActivity = Date.now();
+                }
             }
         }
     });
 
-    return { roomId: affectedRoomId };
+    return { roomId: affectedRoomId, room: roomRef };
 };
 
 export const cleanupRooms = () => {

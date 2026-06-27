@@ -149,28 +149,35 @@ export const Lobby: React.FC<LobbyProps> = ({
                 </div>
               </div>
 
-              <div className="bg-slate-900/50 rounded-2xl p-4 border border-slate-700 h-48 overflow-y-auto">
-                <h3 className="text-xs font-black uppercase text-slate-500 mb-3 ml-1 tracking-widest">Salas Públicas Activas</h3>
-                {publicRooms.length === 0 ? (
-                  <p className="text-slate-600 text-sm font-bold text-center mt-10 italic">No hay salas públicas disponibles.</p>
-                ) : (
-                  <div className="flex flex-col gap-2">
-                    {publicRooms.map(room => (
-                      <div key={room.id} className="bg-slate-800 p-3 rounded-xl flex justify-between items-center border border-slate-700">
-                        <div>
-                          <p className="text-white font-bold text-sm">{room.host}</p>
-                          <p className="text-slate-400 text-xs">{room.playerCount}/6 Médicos</p>
+              <div className="bg-slate-900/50 rounded-2xl p-4 border border-slate-700 h-48 flex flex-col">
+                <div className="flex justify-between items-center mb-3">
+                  <h3 className="text-xs font-black uppercase text-slate-500 ml-1 tracking-widest">Salas Públicas Activas</h3>
+                  <button onClick={fetchRooms} className="text-blue-400 hover:text-blue-300 p-1 bg-blue-500/10 rounded-lg transition" title="Actualizar">
+                    <Zap size={14} />
+                  </button>
+                </div>
+                <div className="overflow-y-auto flex-1">
+                  {publicRooms.length === 0 ? (
+                    <p className="text-slate-600 text-sm font-bold text-center mt-6 italic">No hay salas públicas disponibles.</p>
+                  ) : (
+                    <div className="flex flex-col gap-2">
+                      {publicRooms.map(room => (
+                        <div key={room.id} className="bg-slate-800 p-3 rounded-xl flex justify-between items-center border border-slate-700">
+                          <div>
+                            <p className="text-white font-bold text-sm">{room.host}</p>
+                            <p className="text-slate-400 text-xs">{room.playerCount}/6 Médicos</p>
+                          </div>
+                          <button 
+                            onClick={() => { setLocalRoomId(room.id); onJoinRoom(room.id); }}
+                            className="bg-green-600/20 hover:bg-green-500/40 text-green-400 p-2 rounded-lg transition"
+                          >
+                            <LogIn size={18} />
+                          </button>
                         </div>
-                        <button 
-                          onClick={() => { setLocalRoomId(room.id); onJoinRoom(room.id); }}
-                          className="bg-green-600/20 hover:bg-green-500/40 text-green-400 p-2 rounded-lg transition"
-                        >
-                          <LogIn size={18} />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           )}

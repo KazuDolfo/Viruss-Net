@@ -2,7 +2,7 @@ import express from 'express';
 import { createServer } from 'http';
 import { Server, Socket } from 'socket.io';
 import cors from 'cors';
-import { createRoom, joinRoom, startGame, getRoom, processAction, cleanupRooms, handleDisconnect, getPublicRooms, closeRoom } from './gameManager';
+import { createRoom, joinRoom, startGame, getRoom, processAction, cleanupRooms, handleDisconnect, getPublicRooms, closeRoom, leaveRoom } from './gameManager';
 import cardImagesRouter from './routes/cardImages';
 import { logger } from './core/logger';
 
@@ -38,6 +38,7 @@ app.use(cors({
 app.use('/api/card-images', cardImagesRouter);
 
 app.get('/api/rooms', (req, res) => {
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
   res.json(getPublicRooms());
 });
 
@@ -65,10 +66,15 @@ io.on('connection', (socket: Socket) => {
         createRoom(roomId);
         const room = joinRoom(roomId, { id: playerId, name: playerName, socketId: socket.id, sessionToken });
         socket.join(roomId);
-        io.to(roomId).emit('room_update', { 
-            players: room.players.map(p => ({ id: p.id, name: p.name })),
+        
+        const updateData = { 
+            players: room.players.map((p: any) => ({ id: p.id, name: p.name, connected: !!p.socketId })),
             status: room.status 
-        });
+        };
+        
+        socket.emit('room_update', updateData); // Explicit local emit to bypass latency
+        io.to(roomId).emit('room_update', updateData);
+        
         socket.emit('room_created', roomId);
     } catch (e: any) {
         logger.error('Create room failed', { error: e.message, roomId, playerId });
@@ -88,6 +94,29 @@ io.on('connection', (socket: Socket) => {
     }
   });
 
+  socket.on('leave_room', ({ roomId, playerId }) => {
+    try {
+        logger.info('Player explicitly leaving room', { roomId, playerId });
+        const updatedRoom = leaveRoom(roomId, playerId);
+        socket.leave(roomId);
+        if (updatedRoom) {
+            io.to(roomId).emit('room_update', { 
+                players: updatedRoom.players.map((p: any) => ({ id: p.id, name: p.name, connected: !!p.socketId })),
+                status: updatedRoom.status 
+            });
+            if (updatedRoom.gameState) {
+                updatedRoom.players.forEach(p => {
+                    if (p.socketId) {
+                        io.to(p.socketId).emit('game_update', sanitizeState(updatedRoom.gameState, p.id));
+                    }
+                });
+            }
+        }
+    } catch (e: any) {
+        logger.error('Leave room failed', { error: e.message, roomId, playerId });
+    }
+  });
+
   socket.on('join_room', ({ roomId, playerName, playerId, sessionToken }) => {
     try {
         logger.info('Player joining room', { roomId, playerName, playerId });
@@ -101,7 +130,7 @@ io.on('connection', (socket: Socket) => {
         socket.join(roomId);
         
         io.to(roomId).emit('room_update', { 
-            players: room.players.map(p => ({ id: p.id, name: p.name })),
+            players: room.players.map((p: any) => ({ id: p.id, name: p.name, connected: !!p.socketId })),
             status: room.status 
         });
 
@@ -121,7 +150,7 @@ io.on('connection', (socket: Socket) => {
         if (state) {
             const room = getRoom(roomId);
             io.to(roomId).emit('room_update', { 
-                players: room.players.map(p => ({ id: p.id, name: p.name })),
+                players: room.players.map((p: any) => ({ id: p.id, name: p.name, connected: !!p.socketId })),
                 status: room.status 
             });
             room.players.forEach(p => {
@@ -178,23 +207,29 @@ io.on('connection', (socket: Socket) => {
     }
   });
 
-  socket.on('disconnect', () => {
-    logger.info('User disconnected', { socketId: socket.id });
-    const result = handleDisconnect(socket.id);
+  socket.on('disconnect', (reason) => {
+    logger.info('User disconnected', { socketId: socket.id, reason });
+    const { roomId, room } = handleDisconnect(socket.id);
+    if (roomId && room && room.status === 'waiting') {
+        io.to(roomId).emit('room_update', { 
+            players: room.players.map((p: any) => ({ id: p.id, name: p.name })),
+            status: room.status 
+        });
+    }
     
-    if (result.roomId) {
-        const room = getRoom(result.roomId);
-        if (room) {
-            io.to(result.roomId).emit('room_update', { 
-                players: room.players.map(p => ({ id: p.id, name: p.name })),
-                status: room.status 
+    if (roomId && !room) {
+        const roomRemaining = getRoom(roomId);
+        if (roomRemaining) {
+            io.to(roomId).emit('room_update', { 
+                players: roomRemaining.players.map((p: any) => ({ id: p.id, name: p.name, connected: !!p.socketId })),
+                status: roomRemaining.status 
             });
             
             // Notify other players if the game is active (they might want to know someone is offline)
-            if (room.gameState) {
-                room.players.forEach(p => {
+            if (roomRemaining.gameState) {
+                roomRemaining.players.forEach(p => {
                     if (p.socketId) {
-                        io.to(p.socketId).emit('game_update', sanitizeState(room.gameState, p.id));
+                        io.to(p.socketId).emit('game_update', sanitizeState(roomRemaining.gameState, p.id));
                     }
                 });
             }

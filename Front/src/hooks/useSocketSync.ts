@@ -54,7 +54,7 @@ export const useSocketSync = () => {
     };
 
     const onRoomUpdate = (data: { 
-      players: { id: string, name: string }[], 
+      players: { id: string, name: string, connected?: boolean }[], 
       status: 'waiting' | 'playing' | 'finished' 
     }) => {
       setRoomPlayers(data.players);
