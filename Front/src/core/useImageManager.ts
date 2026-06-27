@@ -17,7 +17,9 @@ interface ImageState {
   updateImage: (key: keyof CardImageMap, url: string, password?: string) => Promise<{ success: boolean; error?: string }>;
 }
 
-const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+// Only fetch from the backend once per session to get Cloudinary URLs
+const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || 'https://virus-backend01.onrender.com';
+let isFetching = false;
 
 const DEFAULT_IMAGES: CardImageMap = {
   "heart": "https://res.cloudinary.com/diva0hfgm/image/upload/f_auto,q_auto,w_300/v1778137322/Heart-organ_qtir3b.png",

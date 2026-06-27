@@ -55,7 +55,7 @@ export const Lobby: React.FC<LobbyProps> = ({
   }, []);
 
   const fetchRooms = () => {
-    const API_BASE = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+    const API_BASE = import.meta.env.VITE_BACKEND_URL || 'https://virus-backend01.onrender.com';
     fetch(`${API_BASE}/api/rooms`)
       .then(r => r.json())
       .then(data => setPublicRooms(data))
