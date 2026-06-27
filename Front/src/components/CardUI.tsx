@@ -129,14 +129,17 @@ const CardUIBase: React.FC<CardUIProps> = ({ card, onClick, selected, disabled, 
   return (
     <div
       onClick={!disabled ? onClick : undefined}
+      role="button"
+      tabIndex={0}
+      aria-label={`Carta: ${card.name}, Tipo: ${card.type}, Color: ${card.color}`}
       className={cn(
-        'relative flex flex-col items-center justify-between border-[2px] md:border-[3px] p-1.5 md:p-2 transition-all cursor-pointer shadow-xl select-none touch-manipulation overflow-hidden group bg-gradient-to-b will-change-transform aspect-[var(--card-aspect)] shrink-0 card-container',
+        'relative flex flex-col items-center justify-between border-[2px] md:border-[3px] p-1.5 md:p-2 transition-premium cursor-pointer shadow-xl select-none touch-manipulation overflow-hidden group bg-gradient-to-b will-change-transform aspect-[var(--card-aspect)] shrink-0 card-container focus-ring',
         small ? 'rounded-md' : 'rounded-lg md:rounded-xl',
         colorMap[card.color],
         // Use the fluid variables directly or fill container if small
         small ? 'w-full h-full' : 'w-[var(--card-w-base)]',
         selected ? 'ring-4 ring-white -translate-y-4 scale-105 z-20 shadow-[0_0_40px_rgba(255,255,255,0.5)]' : !small && 'hover:-translate-y-2 hover:scale-[1.02]',
-        disabled && 'opacity-40 grayscale cursor-not-allowed',
+        disabled && 'opacity-40 grayscale cursor-not-allowed focus:ring-0',
         className
       )}
     >

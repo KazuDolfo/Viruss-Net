@@ -92,8 +92,8 @@ export const GameTable: React.FC<GameTableProps> = ({
           "w-full max-w-[1600px] flex-none flex no-scrollbar transition-all duration-500 mt-2 md:mt-0",
           // Mobile: Carousel
           "flex-nowrap overflow-x-auto snap-x snap-mandatory gap-4 pb-4 md:pb-0",
-          // Desktop: Flex-Wrap with centering
-          "md:flex-wrap md:overflow-visible md:justify-center md:gap-x-6 md:gap-y-8"
+          // Desktop: Flex-Wrap with centering, plus height limits to avoid crushing main player on ultra-wide
+          "md:flex-wrap md:overflow-visible md:justify-center md:gap-x-6 md:gap-y-8 md:max-h-[45vh]"
         )}
       >
         {rivals.map((p) => (
