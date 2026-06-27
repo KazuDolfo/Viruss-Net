@@ -205,7 +205,6 @@ const App: React.FC = () => {
         <GameHeader 
           isMyTurn={isMyTurn} isDrawingState={isDrawingState}
           currentPlayerName={currentPlayer.name} 
-          onLeave={leaveRoom}
           isConnected={isConnected}
         />
         <PlayerStatusPanel />
@@ -213,6 +212,7 @@ const App: React.FC = () => {
           hand={myPlayer.hand} selectedCards={selectedCards}
           onCardClick={handleCardClick} isMyTurn={isMyTurn}
           isDrawingState={isDrawingState}
+          onLeave={leaveRoom}
         />
         <SocialDock onSendReaction={sendReaction} onSendMessage={sendMessage} />
       </div>

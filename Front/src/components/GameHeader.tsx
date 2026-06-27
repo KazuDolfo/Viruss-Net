@@ -6,12 +6,10 @@ interface GameHeaderProps {
   isMyTurn: boolean;
   isDrawingState: boolean;
   currentPlayerName: string;
-  onLeave: () => void;
   isConnected?: boolean;
 }
 
 export const GameHeader: React.FC<GameHeaderProps> = ({
-  onLeave,
   isConnected = true
 }) => {
   return (
