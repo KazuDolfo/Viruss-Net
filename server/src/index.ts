@@ -2,7 +2,7 @@ import express from 'express';
 import { createServer } from 'http';
 import { Server, Socket } from 'socket.io';
 import cors from 'cors';
-import { createRoom, joinRoom, startGame, getRoom, processAction, cleanupRooms, handleDisconnect } from './gameManager';
+import { createRoom, joinRoom, startGame, getRoom, processAction, cleanupRooms, handleDisconnect, getPublicRooms, closeRoom } from './gameManager';
 import cardImagesRouter from './routes/cardImages';
 import { logger } from './core/logger';
 
@@ -37,6 +37,10 @@ app.use(cors({
 
 app.use('/api/card-images', cardImagesRouter);
 
+app.get('/api/rooms', (req, res) => {
+  res.json(getPublicRooms());
+});
+
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
@@ -54,6 +58,35 @@ setInterval(cleanupRooms, 15 * 60 * 1000);
 
 io.on('connection', (socket: Socket) => {
   logger.info('User connected', { socketId: socket.id });
+
+  socket.on('create_room', ({ roomId, playerName, playerId, sessionToken }) => {
+    try {
+        logger.info('Player creating room', { roomId, playerName, playerId });
+        createRoom(roomId);
+        const room = joinRoom(roomId, { id: playerId, name: playerName, socketId: socket.id, sessionToken });
+        socket.join(roomId);
+        io.to(roomId).emit('room_update', { 
+            players: room.players.map(p => ({ id: p.id, name: p.name })),
+            status: room.status 
+        });
+        socket.emit('room_created', roomId);
+    } catch (e: any) {
+        logger.error('Create room failed', { error: e.message, roomId, playerId });
+        socket.emit('error', e.message);
+    }
+  });
+
+  socket.on('close_room', ({ roomId, playerId }) => {
+    try {
+        logger.info('Player closing room', { roomId, playerId });
+        if(closeRoom(roomId, playerId)) {
+            io.to(roomId).emit('error', 'La sala ha sido cerrada por el anfitrión.');
+            io.in(roomId).socketsLeave(roomId);
+        }
+    } catch(e: any) {
+        socket.emit('error', e.message);
+    }
+  });
 
   socket.on('join_room', ({ roomId, playerName, playerId, sessionToken }) => {
     try {

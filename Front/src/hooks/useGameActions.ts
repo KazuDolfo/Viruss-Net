@@ -43,8 +43,26 @@ export const useGameActions = () => {
     window.location.reload();
   };
 
+  const createRoom = (roomId: string, playerName: string, sessionToken: string) => {
+    sessionManager.save({ 
+      roomCode: roomId, 
+      playerName, 
+      sessionToken,
+      playerId
+    });
+    socket.emit('create_room', { roomId, playerName, playerId, sessionToken });
+  };
+
+  const closeRoom = () => {
+    if (roomCode && playerId) {
+      socket.emit('close_room', { roomId: roomCode, playerId });
+    }
+  };
+
   return {
     joinRoom,
+    createRoom,
+    closeRoom,
     startGame,
     sendAction,
     leaveRoom

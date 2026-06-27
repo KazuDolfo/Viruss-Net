@@ -43,7 +43,7 @@ const App: React.FC = () => {
   const setPlayerId = useGameStore(state => state.setPlayerId);
   const setRoomCode = useGameStore(state => state.setRoomCode);
 
-  const { joinRoom, startGame, sendAction, leaveRoom } = useGameActions();
+  const { joinRoom, createRoom, closeRoom, startGame, sendAction, leaveRoom } = useGameActions();
   const { 
     selectedCards, 
     pendingTargets, 
@@ -111,12 +111,28 @@ const App: React.FC = () => {
     };
   }, [setPlayerId]);
 
-  const onJoinRoom = useCallback(() => {
-    if (!localRoomId || !playerName) return;
+  const onJoinRoom = useCallback((idToJoin?: string) => {
+    const targetRoomId = idToJoin || localRoomId;
+    if (!targetRoomId || !playerName) return;
     const session = sessionManager.get();
-    setRoomCode(localRoomId);
-    joinRoom(localRoomId, playerName, session.sessionToken || '');
+    setRoomCode(targetRoomId);
+    setLocalRoomId(targetRoomId);
+    joinRoom(targetRoomId, playerName, session.sessionToken || '');
   }, [localRoomId, playerName, setRoomCode, joinRoom]);
+
+  const onCreateRoom = useCallback(() => {
+    if (!playerName) return;
+    const session = sessionManager.get();
+    const newRoomId = `SALA-${Math.floor(Math.random() * 10000)}`;
+    setRoomCode(newRoomId);
+    setLocalRoomId(newRoomId);
+    createRoom(newRoomId, playerName, session.sessionToken || '');
+  }, [playerName, setRoomCode, createRoom]);
+
+  const onCloseRoom = useCallback(() => {
+    closeRoom();
+    leaveRoom();
+  }, [closeRoom, leaveRoom]);
 
   const handleDrawCard = useCallback(() => {
     sendAction('DRAW', {});
@@ -152,6 +168,7 @@ const App: React.FC = () => {
           playerName={playerName} setPlayerName={setPlayerName}
           localRoomId={localRoomId} setLocalRoomId={setLocalRoomId}
           onJoinRoom={onJoinRoom} onLeave={leaveRoom}
+          onCreateRoom={onCreateRoom} onCloseRoom={onCloseRoom}
           roomPlayers={roomPlayers}
           playerId={playerId} roomCode={roomCode}
           copyRoomId={() => { navigator.clipboard.writeText(roomCode || ''); setCopied(true); setTimeout(() => setCopied(false), 2000); }}

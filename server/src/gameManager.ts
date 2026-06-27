@@ -16,9 +16,19 @@ interface Room {
 }
 
 const rooms: Record<string, Room> = {};
+const MAX_ROOMS = 5;
+
+export const getPublicRooms = () => {
+    return Object.values(rooms)
+        .filter(r => r.status === 'waiting')
+        .map(r => ({ id: r.id, playerCount: r.players.length, host: r.players[0]?.name || 'Sala' }));
+};
 
 export const createRoom = (roomId: string) => {
     if (!rooms[roomId]) {
+        if (Object.keys(rooms).length >= MAX_ROOMS) {
+            throw new Error('Límite máximo de salas alcanzado (5).');
+        }
         rooms[roomId] = {
             id: roomId,
             players: [],
@@ -30,8 +40,20 @@ export const createRoom = (roomId: string) => {
     return rooms[roomId];
 };
 
+export const closeRoom = (roomId: string, playerId: string) => {
+    const room = rooms[roomId];
+    if (room && room.players.length > 0 && room.players[0].id === playerId) {
+        delete rooms[roomId];
+        return true;
+    }
+    throw new Error('No tienes permisos para cerrar esta sala o la sala no existe.');
+};
+
 export const joinRoom = (roomId: string, player: { id: string, name: string, socketId: string, sessionToken: string }) => {
-    const room = rooms[roomId] || createRoom(roomId);
+    if (!rooms[roomId]) {
+        throw new Error('Código de Sala Inválido o Cerrado.');
+    }
+    const room = rooms[roomId];
     room.lastActivity = Date.now();
 
     // Reconnection check
