@@ -182,47 +182,48 @@ const CardUIBase: React.FC<CardUIProps> = ({ card, onClick, selected, disabled, 
       )}
 
       {/* BASE DESIGN / FALLBACK */}
-      {showFallback && (
-        <>
-          <div className="flex flex-col items-center gap-0.5 md:gap-1 z-20 w-full px-1 mt-1">
-            <div className={cn(
-               "text-white font-black text-center leading-tight drop-shadow-lg",
-               small ? "text-[clamp(6px,14cqi,16px)]" : "text-[clamp(10px,12cqi,24px)]"
-            )}>
-              {card.name}
-            </div>
-            {!small && card.description && (
-              <p className="text-[clamp(6px,8cqi,14px)] text-white/70 font-medium text-center leading-tight line-clamp-2 italic px-1 md:px-2">
-                {card.description}
-              </p>
-            )}
+      <div className={cn(
+        "flex flex-col w-full h-full items-center justify-between transition-opacity duration-500",
+        (!hasCustomImage || imageStatus === 'error') ? "opacity-100" : "opacity-0 pointer-events-none"
+      )}>
+        <div className="flex flex-col items-center gap-0.5 md:gap-1 z-20 w-full px-1 mt-1">
+          <div className={cn(
+             "text-white font-black text-center leading-tight drop-shadow-lg",
+             small ? "text-[clamp(6px,14cqi,16px)]" : "text-[clamp(10px,12cqi,24px)]"
+          )}>
+            {card.name}
           </div>
-          
-          <div className="flex flex-1 items-center justify-center py-1 z-20 relative w-full">
-            <div className={cn(
-              "rounded-full flex items-center justify-center transition-all duration-500 group-hover:rotate-12",
-              small ? "p-0.5" : "p-2 md:p-5 bg-white/10 backdrop-blur-md border border-white/20 shadow-inner"
-            )}>
-              <Icon 
-                className={cn(
-                  "text-white drop-shadow-glow",
-                  small ? "w-6 h-6 md:w-8 md:h-8" : "w-12 h-12 md:w-20 md:h-20"
-                )} 
-              />
-            </div>
-          </div>
-
-          {!small && (
-            <div className="w-full z-20">
-               <div className="bg-black/40 backdrop-blur-md rounded-lg py-1 md:py-2 px-2 border border-white/10 shadow-lg">
-                  <p className="text-[9px] md:text-xs text-white font-black text-center tracking-widest uppercase truncate">
-                    {theme?.label || card.type}
-                  </p>
-               </div>
-            </div>
+          {!small && card.description && (
+            <p className="text-[clamp(6px,8cqi,14px)] text-white/70 font-medium text-center leading-tight line-clamp-2 italic px-1 md:px-2">
+              {card.description}
+            </p>
           )}
-        </>
-      )}
+        </div>
+        
+        <div className="flex flex-1 items-center justify-center py-1 z-20 relative w-full">
+          <div className={cn(
+            "rounded-full flex items-center justify-center transition-all duration-500 group-hover:rotate-12",
+            small ? "p-0.5" : "p-2 md:p-5 bg-white/10 backdrop-blur-md border border-white/20 shadow-inner"
+          )}>
+            <Icon 
+              className={cn(
+                "text-white drop-shadow-glow",
+                small ? "w-6 h-6 md:w-8 md:h-8" : "w-12 h-12 md:w-20 md:h-20"
+              )} 
+            />
+          </div>
+        </div>
+
+        {!small && (
+          <div className="w-full z-20">
+             <div className="bg-black/40 backdrop-blur-md rounded-lg py-1 md:py-2 px-2 border border-white/10 shadow-lg">
+                <p className="text-[9px] md:text-xs text-white font-black text-center tracking-widest uppercase truncate">
+                  {theme?.label || card.type}
+                </p>
+             </div>
+          </div>
+        )}
+      </div>
 
       {/* SELECTION INDICATOR */}
       {selected && !small && (
